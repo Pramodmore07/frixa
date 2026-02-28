@@ -39,15 +39,22 @@ export default function LoginScreen({ onGuestMode }) {
         if (!email.trim() || !password.trim()) { setError("Please fill in all fields."); return; }
         setLoading(true); setError(""); setInfo("");
         try {
+            const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
             if (mode === "signup") {
-                const { error: err } = await supabase.auth.signUp({ email, password });
+                const { error: err } = await supabase.auth.signUp({
+                    email, password,
+                    options: { emailRedirectTo: appUrl },
+                });
                 if (err) { setError(err.message); }
                 else { setInfo("✅ Account created! Check your email for a confirmation link, then sign in."); setMode("signin"); }
             } else {
                 const { error: err } = await supabase.auth.signInWithPassword({ email, password });
                 if (err) {
                     if (err.message.toLowerCase().includes("invalid login credentials")) {
-                        const { error: upErr } = await supabase.auth.signUp({ email, password });
+                        const { error: upErr } = await supabase.auth.signUp({
+                            email, password,
+                            options: { emailRedirectTo: appUrl },
+                        });
                         if (upErr) {
                             setError(upErr.message.includes("already registered")
                                 ? "Not verified yet? Check your inbox for a confirmation link."
