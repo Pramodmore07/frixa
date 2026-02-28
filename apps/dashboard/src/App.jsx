@@ -98,6 +98,12 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        // Remove the #access_token hash Supabase appends after email confirmation / OAuth
+        if (window.location.hash) {
+          window.history.replaceState({}, "", window.location.pathname + window.location.search);
+        }
+      }
       if (event === "SIGNED_OUT") {
         setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setCurrentProject(null); setLoading(false);
       }
