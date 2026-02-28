@@ -1,0 +1,16 @@
+{
+    "name": "frixa",
+    "private": true,
+    "version": "1.0.0",
+    "workspaces": [
+        "apps/dashboard",
+        "apps/landing",
+        "apps/admin"
+    ],
+    "scripts": {
+        "dashboard": "npm run dev --workspace=apps/dashboard",
+        "landing": "npm run dev --workspace=apps/landing",
+        "admin": "npm run dev --workspace=apps/admin",
+        "build:all": "npm run build --workspaces"
+    }
+}
