@@ -133,16 +133,25 @@ export default function App() {
       const [tRes, iRes, sRes] = await Promise.all([
         fetchTasks(projectId), fetchIdeas(projectId), fetchStages(projectId),
       ]);
+
+      // Always set tasks/ideas even if empty — don't block on errors
+      setTasks(Array.isArray(tRes.data) ? tRes.data.map(dbToTask) : []);
+      setIdeas(Array.isArray(iRes.data) ? iRes.data.map(dbToIdea) : []);
+
       if (sRes.data?.length > 0) {
         setStages(sRes.data.map(dbToStage));
       } else {
         setStages(DEFAULT_STAGES);
-        if (!guestMode) await upsertStages(DEFAULT_STAGES, user?.id, projectId);
+        // Only upsert stages if we are a member (will fail silently if not)
+        if (!guestMode && !sRes.error) {
+          await upsertStages(DEFAULT_STAGES, user?.id, projectId);
+        }
       }
-      setTasks(Array.isArray(tRes.data) ? tRes.data.map(dbToTask) : []);
-      setIdeas(Array.isArray(iRes.data) ? iRes.data.map(dbToIdea) : []);
     } catch {
-      showToast("Failed to load project data.");
+      // Don't show error — partial data is better than blocking the UI
+      setTasks([]);
+      setIdeas([]);
+      setStages(DEFAULT_STAGES);
     } finally {
       setLoading(false);
     }

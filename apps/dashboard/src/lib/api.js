@@ -72,11 +72,36 @@ export function dbToStage(row) {
    PROJECTS & COLLABORATION
 ══════════════════════════════════════════════════════ */
 export async function fetchProjects() {
-    // Use the SECURITY DEFINER RPC — bypasses all RLS, no recursion, works for
-    // every user (owner AND invited members).
-    const { data, error } = await supabase.rpc("get_my_projects");
-    if (error) return { data: [], error };
-    return { data: data || [], error: null };
+    // Strategy: two parallel queries — owned projects (always works via owner_id RLS)
+    // and member projects (via project_members join). Merge and deduplicate.
+    // This avoids any RPC dependency and works regardless of whether policies are set up.
+
+    const [ownedRes, memberRes] = await Promise.all([
+        // Query 1: projects where I am the owner (direct column match — always passes RLS)
+        supabase.from("projects").select("*").order("created_at"),
+
+        // Query 2: projects where I am a member via project_members
+        // Using a nested select so the RLS on project_members uses the simple
+        // "Users can read own membership" policy (auth.uid() = user_id)
+        supabase.from("project_members").select("project_id").then(async ({ data: rows }) => {
+            if (!rows || rows.length === 0) return { data: [] };
+            const ids = rows.map(r => r.project_id);
+            return supabase.from("projects").select("*").in("id", ids).order("created_at");
+        }),
+    ]);
+
+    const owned = ownedRes.data || [];
+    const membered = (memberRes.data) || [];
+
+    // Merge + deduplicate by id
+    const seen = new Set();
+    const all = [];
+    for (const p of [...owned, ...membered]) {
+        if (!seen.has(p.id)) { seen.add(p.id); all.push(p); }
+    }
+    all.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    return { data: all, error: null };
 }
 
 export async function createProject(name, ownerId) {
