@@ -146,9 +146,16 @@ CREATE POLICY "Members can view project" ON projects
 -- project_members
 DROP POLICY IF EXISTS "Owner manages members" ON project_members;
 CREATE POLICY "Owner manages members" ON project_members
+  FOR ALL
   USING (public.is_project_owner(project_id))
   WITH CHECK (public.is_project_owner(project_id));
 
+-- Every user can always read their OWN membership rows (needed for fetchProjects)
+DROP POLICY IF EXISTS "Users can read own membership" ON project_members;
+CREATE POLICY "Users can read own membership" ON project_members
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Members can also see other members in the same project
 DROP POLICY IF EXISTS "Members can see co-members" ON project_members;
 CREATE POLICY "Members can see co-members" ON project_members
   FOR SELECT USING (
