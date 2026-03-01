@@ -1,11 +1,9 @@
 -- ══════════════════════════════════════════════════════════════════════════════
--- FRIXA — COMPLETE FIX SQL
+-- FRIXA — COMPLETE FIX SQL  (idempotent — safe to re-run any number of times)
 -- Run this ENTIRE block in Supabase → SQL Editor → New Query → Run
--- This replaces all previous partial fixes.
 -- ══════════════════════════════════════════════════════════════════════════════
 
--- ── STEP 1: Recreate helper functions with SECURITY DEFINER + search_path ──────
--- This prevents RLS recursion entirely.
+-- ── STEP 1: Recreate helper functions (SECURITY DEFINER prevents RLS recursion) ──
 
 CREATE OR REPLACE FUNCTION public.is_project_member(p_id UUID)
 RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
@@ -36,7 +34,6 @@ BEGIN
 END;
 $$;
 
--- Optional RPC (not required by app, but useful)
 CREATE OR REPLACE FUNCTION public.get_my_projects()
 RETURNS TABLE (id UUID, name TEXT, owner_id UUID, created_at TIMESTAMPTZ)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
@@ -53,12 +50,12 @@ BEGIN
 END;
 $$;
 
--- ── STEP 2: Fix projects RLS ───────────────────────────────────────────────────
--- The bug: "Owner manages project" uses FOR ALL which blocks member SELECTs.
--- Fix: separate INSERT/UPDATE/DELETE from SELECT.
+-- ── STEP 2: projects — drop ALL known policy names then recreate ───────────────
 
 DROP POLICY IF EXISTS "Owner manages project"    ON public.projects;
 DROP POLICY IF EXISTS "Owner can insert project" ON public.projects;
+DROP POLICY IF EXISTS "Owner can update project" ON public.projects;
+DROP POLICY IF EXISTS "Owner can delete project" ON public.projects;
 DROP POLICY IF EXISTS "Members can view project" ON public.projects;
 
 -- Members AND owners can SELECT
@@ -80,13 +77,14 @@ CREATE POLICY "Owner can update project" ON public.projects
 CREATE POLICY "Owner can delete project" ON public.projects
   FOR DELETE USING (auth.uid() = owner_id);
 
--- ── STEP 3: Fix project_members RLS ───────────────────────────────────────────
+-- ── STEP 3: project_members — drop ALL known policy names then recreate ────────
+
 DROP POLICY IF EXISTS "Owner manages members"         ON public.project_members;
+DROP POLICY IF EXISTS "Owner removes members"         ON public.project_members;
 DROP POLICY IF EXISTS "Users can read own membership" ON public.project_members;
 DROP POLICY IF EXISTS "Members can see co-members"    ON public.project_members;
 
--- CRITICAL: every user can always read rows where user_id = their own id
--- This is what lets fetchProjects work for both owners and members
+-- Every user can read rows where user_id = their own id (critical for fetchProjects)
 CREATE POLICY "Users can read own membership" ON public.project_members
   FOR SELECT USING (auth.uid() = user_id);
 
@@ -94,35 +92,40 @@ CREATE POLICY "Users can read own membership" ON public.project_members
 CREATE POLICY "Members can see co-members" ON public.project_members
   FOR SELECT USING (public.is_project_member(project_id));
 
--- Only owner can add/remove members
+-- Only owner can add members
 CREATE POLICY "Owner manages members" ON public.project_members
   FOR INSERT WITH CHECK (public.is_project_owner(project_id));
 
+-- Only owner can remove members
 CREATE POLICY "Owner removes members" ON public.project_members
   FOR DELETE USING (public.is_project_owner(project_id));
 
--- ── STEP 4: Fix tasks RLS ─────────────────────────────────────────────────────
+-- ── STEP 4: tasks ──────────────────────────────────────────────────────────────
+
 DROP POLICY IF EXISTS "Members manage tasks" ON public.tasks;
 
 CREATE POLICY "Members manage tasks" ON public.tasks
   USING  (public.is_project_member(project_id))
   WITH CHECK (public.is_project_member(project_id));
 
--- ── STEP 5: Fix ideas RLS ─────────────────────────────────────────────────────
+-- ── STEP 5: ideas ──────────────────────────────────────────────────────────────
+
 DROP POLICY IF EXISTS "Members manage ideas" ON public.ideas;
 
 CREATE POLICY "Members manage ideas" ON public.ideas
   USING  (public.is_project_member(project_id))
   WITH CHECK (public.is_project_member(project_id));
 
--- ── STEP 6: Fix stages RLS ────────────────────────────────────────────────────
+-- ── STEP 6: stages ─────────────────────────────────────────────────────────────
+
 DROP POLICY IF EXISTS "Members manage stages" ON public.stages;
 
 CREATE POLICY "Members manage stages" ON public.stages
   USING  (public.is_project_member(project_id))
   WITH CHECK (public.is_project_member(project_id));
 
--- ── STEP 7: Fix activity_log RLS ──────────────────────────────────────────────
+-- ── STEP 7: activity_log ───────────────────────────────────────────────────────
+
 DROP POLICY IF EXISTS "Members view activity" ON public.activity_log;
 DROP POLICY IF EXISTS "Members log activity"  ON public.activity_log;
 
@@ -132,7 +135,8 @@ CREATE POLICY "Members view activity" ON public.activity_log
 CREATE POLICY "Members log activity" ON public.activity_log
   FOR INSERT WITH CHECK (public.is_project_member(project_id));
 
--- ── STEP 8: Fix profiles RLS ──────────────────────────────────────────────────
+-- ── STEP 8: profiles ───────────────────────────────────────────────────────────
+
 DROP POLICY IF EXISTS "Users can view own profile"          ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile"        ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles"        ON public.profiles;
@@ -142,15 +146,15 @@ DROP POLICY IF EXISTS "Members can view co-member profiles" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
--- Users can UPDATE their own profile (needed for any profile settings changes)
+-- Users can UPDATE their own profile
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
--- Admins can SELECT all profiles (for admin panel)
+-- Admins can SELECT all profiles
 CREATE POLICY "Admins can view all profiles" ON public.profiles
   FOR SELECT USING (public.is_admin());
 
--- Members can SELECT profiles of co-members (needed for CollaboratorsModal to show emails)
+-- Members can SELECT profiles of co-members (for CollaboratorsModal emails)
 CREATE POLICY "Members can view co-member profiles" ON public.profiles
   FOR SELECT USING (
     EXISTS (
@@ -178,7 +182,7 @@ ON CONFLICT (id) DO NOTHING;
 UPDATE public.profiles SET role = 'admin' WHERE email = 'Pramodmore672@gmail.com';
 
 -- ── DONE ──────────────────────────────────────────────────────────────────────
--- Verify: run these selects to confirm data exists
+-- Verify with these selects:
 -- SELECT count(*) FROM project_members;   -- should show rows
 -- SELECT count(*) FROM projects;          -- should show all your projects
 -- SELECT * FROM get_my_projects();        -- should return projects for current user
