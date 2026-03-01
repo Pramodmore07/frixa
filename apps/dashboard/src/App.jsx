@@ -270,6 +270,30 @@ export default function App() {
     }
   }, [guestMode, currentProject, user]);
 
+  const duplicateTask = useCallback(async (task) => {
+    const tempId = Date.now();
+    const newTask = {
+      ...task,
+      id: guestMode ? nextId : tempId,
+      title: task.title + " (copy)",
+      archived: false,
+      sortOrder: (task.sortOrder ?? 0) + 1,
+    };
+    if (guestMode) setNextId((n) => n + 1);
+    setTasks((prev) => {
+      const next = [...prev, newTask];
+      if (guestMode) guestSave(GUEST_TASKS_KEY, next);
+      return next;
+    });
+    if (!guestMode && currentProject) {
+      const { data, error } = await insertTask(taskToDb(newTask, user.id, currentProject.id));
+      if (error) { showToast("Failed to duplicate task."); return; }
+      setTasks((prev) => prev.map((t) => t.id === tempId ? dbToTask(data) : t));
+      await logActivity(currentProject.id, user.id, "task_duplicated", { title: task.title });
+    }
+    showToast(`"${task.title}" duplicated`, "success");
+  }, [guestMode, nextId, user, currentProject, showToast]);
+
   /* ── Ideas CRUD ── */
   const saveIdea = useCallback(async (form) => {
     if (form.id) {
@@ -374,6 +398,7 @@ export default function App() {
             onMoveTask={moveTask}
             onPatchTask={patchTask}
             onTimerDone={(label) => { setTimerDone(label); spawnConfetti(); }}
+            onDuplicateTask={duplicateTask}
           />
         )}
         {page === "ideas" && (

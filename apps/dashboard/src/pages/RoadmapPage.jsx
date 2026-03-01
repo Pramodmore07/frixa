@@ -36,7 +36,7 @@ const VIEWS = [
 
 export default function RoadmapPage({
     tasks, stages, showTimer = true,
-    onEditTask, onAddTask, onMoveTask, onPatchTask, onTimerDone
+    onEditTask, onAddTask, onMoveTask, onPatchTask, onTimerDone, onDuplicateTask
 }) {
     const [view, setView] = useState("kanban");
     const active = tasks.filter((t) => !t.archived);
@@ -121,7 +121,7 @@ export default function RoadmapPage({
                             return (
                                 <div key={col.id} style={{ width: colWidth, flexShrink: 0, display: "flex", flexDirection: "column" }}>
                                     <KanbanCol col={col} tasks={colTasks} animDelay={ci * 0.07}
-                                        onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} />
+                                        onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} onDuplicate={onDuplicateTask} />
                                 </div>
                             );
                         })}

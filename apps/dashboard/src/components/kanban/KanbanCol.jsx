@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import TaskCard from "./TaskCard";
 
-export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove }) {
+export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove, onDuplicate }) {
     const [over, setOver] = useState(false);
     const ref = useRef(null);
 
@@ -102,6 +102,7 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
                             colId={col.id}
                             onEdit={() => onEdit(t)}
                             onMove={onMove}
+                            onDuplicate={onDuplicate}
                         />
                     ))
                 )}

@@ -72,7 +72,27 @@ export function dbToStage(row) {
    PROJECTS & COLLABORATION
 ══════════════════════════════════════════════════════ */
 export async function fetchProjects() {
-    return supabase.from("projects").select("*, project_members(*)").order("created_at");
+    // Fetch all projects the user owns OR is a member of.
+    // We query project_members for the current user first, then fetch those projects.
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { data: [], error: null };
+
+    // Get all project_ids where this user is a member (includes owner row)
+    const { data: memberRows, error: memberErr } = await supabase
+        .from("project_members")
+        .select("project_id")
+        .eq("user_id", user.id);
+
+    if (memberErr) return { data: [], error: memberErr };
+
+    const projectIds = (memberRows || []).map((r) => r.project_id);
+    if (projectIds.length === 0) return { data: [], error: null };
+
+    return supabase
+        .from("projects")
+        .select("*, project_members(*)")
+        .in("id", projectIds)
+        .order("created_at");
 }
 
 export async function createProject(name, ownerId) {

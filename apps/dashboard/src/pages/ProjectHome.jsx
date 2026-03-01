@@ -12,14 +12,8 @@ export default function ProjectHome({ user, onSelectProject }) {
 
     const loadProjects = async () => {
         setLoading(true);
-        console.log("Current user ID:", user?.id);
         const { data, error } = await fetchProjects();
-        if (error) {
-            console.error("fetchProjects error:", error);
-        } else {
-            console.log("Fetched projects:", data);
-            if (data) setProjects(data);
-        }
+        if (!error && data) setProjects(data);
         setLoading(false);
     };
 
@@ -38,8 +32,7 @@ export default function ProjectHome({ user, onSelectProject }) {
         const { data, error } = await createProject(newName.trim(), user.id);
         setSaving(false);
         if (error) {
-            console.error("createProject error:", error);
-            setCreateError(error.message || "Failed to create project. Check console.");
+            setCreateError(error.message || "Failed to create project.");
         } else if (data) {
             onSelectProject(data);
         }
@@ -56,7 +49,7 @@ export default function ProjectHome({ user, onSelectProject }) {
 
     return (
         <div style={{
-            minHeight: "100vh", background: "linear-gradient(145deg,#EFF6FF 0%,#F4F5F7 55%,#F0FDF4 100%)",
+            minHeight: "100vh", background: "linear-gradient(145deg,#F4F5F7 0%,#FAFAFA 55%,#F1F5F9 100%)",
             display: "flex", alignItems: "center", justifyContent: "center", padding: 20
         }}>
             <div style={{ width: 480, background: "#fff", border: "1px solid #E8EAED", borderRadius: 28, padding: 40, boxShadow: "0 28px 72px rgba(0,0,0,.13)" }}>
@@ -135,9 +128,9 @@ export default function ProjectHome({ user, onSelectProject }) {
             <style>{`
                 .project-card-hover:hover {
                     background: #fff !important;
-                    border-color: #2563EB !important;
+                    border-color: #475569 !important;
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(37,99,235,.1);
+                    box-shadow: 0 8px 24px rgba(71,85,105,.1);
                 }
                 @keyframes fadeUp {
                     from { opacity: 0; transform: translateY(10px); }

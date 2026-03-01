@@ -2,9 +2,10 @@ import { useState, useRef } from "react";
 import { dlStatus, dlBadge, DL_BADGE_STYLE, DL_BORDER_COLOR } from "../../utils/deadline";
 import { PRI_COLORS } from "../../constants";
 
-export default function TaskCard({ task, pos, colId, onEdit, onMove }) {
+export default function TaskCard({ task, pos, colId, onEdit, onMove, onDuplicate }) {
     const [dragState, setDragState] = useState(null);
     const [dragging, setDragging] = useState(false);
+    const [hovered, setHovered] = useState(false);
     const ref = useRef(null);
 
     const ds = dlStatus(task.date, task.time);
@@ -58,8 +59,8 @@ export default function TaskCard({ task, pos, colId, onEdit, onMove }) {
                 position: "relative",
                 overflow: "hidden"
             }}
-            onMouseEnter={(e) => { if (!dragging) { e.currentTarget.style.boxShadow = "0 8px 24px rgba(149, 157, 165, 0.15)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
-            onMouseLeave={(e) => { if (!dragging) { e.currentTarget.style.boxShadow = "0 2px 5px rgba(0,0,0,.03)"; e.currentTarget.style.transform = "translateY(0)"; } }}
+            onMouseEnter={(e) => { setHovered(true); if (!dragging) { e.currentTarget.style.boxShadow = "0 8px 24px rgba(149, 157, 165, 0.15)"; e.currentTarget.style.transform = "translateY(-1px)"; } }}
+            onMouseLeave={(e) => { setHovered(false); if (!dragging) { e.currentTarget.style.boxShadow = "0 2px 5px rgba(0,0,0,.03)"; e.currentTarget.style.transform = "translateY(0)"; } }}
         >
             {/* body */}
             <div style={{ padding: "14px 16px 12px" }}>
@@ -82,13 +83,31 @@ export default function TaskCard({ task, pos, colId, onEdit, onMove }) {
                         {task.desc && <div style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{task.desc}</div>}
                     </div>
 
-                    {/* menu dot */}
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                        style={{ flexShrink: 0, width: 28, height: 28, border: "none", background: "transparent", color: "#C9CDD5", fontSize: 20, cursor: "pointer", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, transition: "background .15s, color .15s", padding: 0 }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; e.currentTarget.style.color = "#6B7280"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#C9CDD5"; }}
-                    >⋮</button>
+                    {/* action buttons */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
+                        {/* duplicate button — only visible on hover */}
+                        {hovered && onDuplicate && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onDuplicate(task); }}
+                                title="Duplicate task"
+                                style={{ width: 28, height: 28, border: "1px solid #E8EAED", background: "#F9FAFB", color: "#6B7280", fontSize: 13, cursor: "pointer", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s", padding: 0 }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#111218"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#111218"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "#F9FAFB"; e.currentTarget.style.color = "#6B7280"; e.currentTarget.style.borderColor = "#E8EAED"; }}
+                            >
+                                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                    <rect x="4" y="4" width="8" height="8" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+                                    <path d="M3 9H2a1 1 0 01-1-1V2a1 1 0 011-1h6a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                                </svg>
+                            </button>
+                        )}
+                        {/* edit/menu dot */}
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                            style={{ flexShrink: 0, width: 28, height: 28, border: "none", background: "transparent", color: "#C9CDD5", fontSize: 20, cursor: "pointer", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, transition: "background .15s, color .15s", padding: 0 }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "#F3F4F6"; e.currentTarget.style.color = "#6B7280"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#C9CDD5"; }}
+                        >⋮</button>
+                    </div>
                 </div>
             </div>
 
