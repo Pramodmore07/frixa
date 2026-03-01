@@ -54,7 +54,11 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
         if (opening && !guestMode && user) {
             setLoadingProjects(true);
             const { data } = await fetchProjects();
-            if (data) setProjects(data);
+            if (data) {
+                // Sort by most recently created, then cap at 5 for the dropdown
+                const sorted = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                setProjects(sorted);
+            }
             setLoadingProjects(false);
         }
     };
@@ -140,12 +144,15 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                             animation: "dropDown .18s cubic-bezier(.22,1,.36,1)",
                             zIndex: 400,
                         }}>
-                            {/* Project list */}
+                            {/* Section label */}
+                            <div style={{ padding: "4px 12px 6px", fontSize: 10.5, fontWeight: 700, color: "#9CA3AF", letterSpacing: ".06em", textTransform: "uppercase" }}>Recent Projects</div>
+
+                            {/* Project list — 5 most recent */}
                             {loadingProjects ? (
                                 <div style={{ padding: "12px 10px", fontSize: 12, color: "#9CA3AF", textAlign: "center" }}>Loading…</div>
                             ) : (
-                                <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: projects.length ? 8 : 0 }}>
-                                    {projects.map(p => (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                    {projects.slice(0, 5).map(p => (
                                         <button
                                             key={p.id}
                                             onClick={() => handleSwitch(p)}
@@ -168,13 +175,36 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                                         </button>
                                     ))}
                                     {projects.length === 0 && !guestMode && (
-                                        <div style={{ padding: "10px 12px", fontSize: 12.5, color: "#9CA3AF", fontStyle: "italic" }}>No other projects</div>
+                                        <div style={{ padding: "10px 12px", fontSize: 12.5, color: "#9CA3AF", fontStyle: "italic" }}>No projects yet</div>
                                     )}
                                 </div>
                             )}
 
+                            {/* "View all projects" — shown when there are more than 5 */}
+                            {projects.length > 5 && (
+                                <button
+                                    onClick={() => { setPage("projects"); setDropdownOpen(false); setCreatingNew(false); setNewName(""); }}
+                                    style={{
+                                        width: "100%", padding: "8px 12px", border: "none", borderRadius: 10,
+                                        background: "transparent", fontFamily: "'Poppins',sans-serif",
+                                        fontSize: 12, fontWeight: 600, color: "#475569", cursor: "pointer",
+                                        textAlign: "left", display: "flex", alignItems: "center", gap: 6,
+                                        marginTop: 2,
+                                    }}
+                                    className="proj-item"
+                                >
+                                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0 }}>
+                                        <rect x="1" y="1" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.3" />
+                                        <rect x="7.5" y="1" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.3" />
+                                        <rect x="1" y="7.5" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.3" />
+                                        <rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.3" />
+                                    </svg>
+                                    View all {projects.length} projects
+                                </button>
+                            )}
+
                             {/* Divider */}
-                            <div style={{ height: 1, background: "#F0F1F3", margin: "4px 0 8px" }} />
+                            <div style={{ height: 1, background: "#F0F1F3", margin: "8px 0" }} />
 
                             {/* New project inline form */}
                             {creatingNew ? (

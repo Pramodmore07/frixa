@@ -57,7 +57,7 @@ export function ideaToDb(idea, userId, projectId) {
         description: idea.desc ?? "",
         category: idea.cat ?? "other",
         votes: idea.votes ?? 0,
-        voted: idea.voted ?? false,
+        // Note: 'voted' is per-user UI state — never written to DB
     };
     if (userId) out.user_id = userId;
     if (projectId) out.project_id = projectId;
