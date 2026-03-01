@@ -69,7 +69,7 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete })
                     <p style={{ fontSize: 13.5, color: "#6B7280", marginTop: 5 }}>Completed &amp; shelved tasks</p>
                 </div>
                 <div style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "10px 18px", textAlign: "center", minWidth: 72 }}>
-                    <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 24, fontWeight: 700, color: "#8B5CF6" }}>{archived.length}</div>
+                    <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 24, fontWeight: 700, color: "#475569" }}>{archived.length}</div>
                     <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: ".07em", fontWeight: 600, marginTop: 3 }}>Archived</div>
                 </div>
             </div>
@@ -88,7 +88,7 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete })
                             <div key={t.id} className="row-hover"
                                 style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,.04)", transition: "box-shadow .15s" }}
                             >
-                                <div style={{ width: 22, height: 22, flexShrink: 0, background: "#8B5CF6", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700 }}>✓</div>
+                                <div style={{ width: 22, height: 22, flexShrink: 0, background: "#475569", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700 }}>✓</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: 13.5, fontWeight: 500, color: "#6B7280", textDecoration: "line-through", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 2 }}>{t.title}</div>
                                     <div style={{ fontSize: 11, color: "#9CA3AF" }}>

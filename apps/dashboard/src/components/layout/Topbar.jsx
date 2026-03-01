@@ -111,15 +111,15 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                             display: "flex", alignItems: "center", gap: 8,
                             padding: "6px 14px",
                             background: dropdownOpen ? "#fff" : "#F4F5F7",
-                            border: dropdownOpen ? "1.5px solid #2563EB" : "1.5px solid #E8EAED",
+                            border: dropdownOpen ? "1.5px solid #475569" : "1.5px solid #E8EAED",
                             borderRadius: 99, cursor: "pointer",
                             transition: "all .18s",
                             fontFamily: "'Poppins',sans-serif",
-                            boxShadow: dropdownOpen ? "0 2px 12px rgba(37,99,235,.12)" : "none",
+                            boxShadow: dropdownOpen ? "0 2px 12px rgba(71,85,105,.12)" : "none",
                         }}
                         className="project-pill"
                     >
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: "#2563EB", display: "inline-block" }} />
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0, background: "#475569", display: "inline-block" }} />
                         <span style={{ fontSize: 13, fontWeight: 700, color: "#111218", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {currentProject?.name || "Workspace"}
                         </span>
@@ -151,18 +151,18 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                                             style={{
                                                 display: "flex", alignItems: "center", gap: 10,
                                                 padding: "9px 12px", border: "none", borderRadius: 10,
-                                                background: p.id === currentProject?.id ? "#EFF6FF" : "transparent",
+                                                background: p.id === currentProject?.id ? "#F1F5F9" : "transparent",
                                                 cursor: "pointer", textAlign: "left", transition: "background .12s",
                                                 fontFamily: "'Poppins',sans-serif",
                                             }}
                                             className="proj-item"
                                         >
-                                            <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.id === currentProject?.id ? "#2563EB" : "#D1D5DB", flexShrink: 0 }} />
+                                            <span style={{ width: 8, height: 8, borderRadius: "50%", background: p.id === currentProject?.id ? "#475569" : "#D1D5DB", flexShrink: 0 }} />
                                             <span style={{ fontSize: 13, fontWeight: p.id === currentProject?.id ? 700 : 500, color: "#111218", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                                 {p.name}
                                             </span>
                                             {p.id === currentProject?.id && (
-                                                <span style={{ fontSize: 10, fontWeight: 700, color: "#2563EB", background: "#DBEAFE", borderRadius: 6, padding: "1px 6px" }}>Active</span>
+                                                <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", background: "#E2E8F0", borderRadius: 6, padding: "1px 6px" }}>Active</span>
                                             )}
                                         </button>
                                     ))}
@@ -185,9 +185,9 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                                         onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") { setCreatingNew(false); setNewName(""); } }}
                                         placeholder="Project name…"
                                         style={{
-                                            width: "100%", padding: "9px 12px", border: "1.5px solid #DBEAFE",
+                                            width: "100%", padding: "9px 12px", border: "1.5px solid #CBD5E1",
                                             borderRadius: 10, fontSize: 13, fontFamily: "'Poppins',sans-serif",
-                                            fontWeight: 500, color: "#111218", background: "#F8FAFF",
+                                            fontWeight: 500, color: "#111218", background: "#F8FAFC",
                                             outline: "none", boxSizing: "border-box", marginBottom: 8,
                                         }}
                                     />
@@ -317,7 +317,7 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
             </div>
 
             <style>{`
-                .project-pill:hover { background: #fff !important; border-color: #2563EB !important; }
+                .project-pill:hover { background: #fff !important; border-color: #475569 !important; }
                 .proj-item:hover { background: #F4F5F7 !important; }
                 @keyframes dropDown {
                     from { opacity: 0; transform: translateY(-8px); }

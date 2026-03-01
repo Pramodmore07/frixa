@@ -4,7 +4,7 @@ import { fetchProjectMembers, inviteMemberByEmail, removeMember } from "../../li
 
 function RoleBadge({ role }) {
     const colors = {
-        owner: { bg: "#EFF6FF", color: "#2563EB" },
+        owner: { bg: "#F1F5F9", color: "#475569" },
         member: { bg: "#F0FDF4", color: "#16A34A" },
         viewer: { bg: "#F9FAFB", color: "#6B7280" },
     };
@@ -150,9 +150,9 @@ export default function CollaboratorsModal({ project, user, onClose }) {
                                     key={m.user_id}
                                     style={{
                                         display: "flex", alignItems: "center", gap: 10,
-                                        padding: "10px 12px", background: isMe ? "#F8FAFF" : "#F9FAFB",
+                                        padding: "10px 12px", background: isMe ? "#F8FAFC" : "#F9FAFB",
                                         borderRadius: 12,
-                                        border: `1px solid ${isMe ? "#DBEAFE" : "#E8EAED"}`,
+                                        border: `1px solid ${isMe ? "#CBD5E1" : "#E8EAED"}`,
                                     }}
                                 >
                                     <Avatar email={memberEmail} isMe={isMe} />
@@ -195,20 +195,20 @@ export default function CollaboratorsModal({ project, user, onClose }) {
             </div>
 
             {/* Invite link */}
-            <div style={{ padding: "14px 16px", background: "#F0F7FF", borderRadius: 14, border: "1px solid #DBEAFE", marginBottom: 4 }}>
+            <div style={{ padding: "14px 16px", background: "#F8FAFC", borderRadius: 14, border: "1px solid #CBD5E1", marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                        <path d="M5.5 7.5a3 3 0 004.243 0l1.5-1.5a3 3 0 00-4.243-4.243L6 2.757" stroke="#2563EB" strokeWidth="1.4" strokeLinecap="round" />
-                        <path d="M7.5 5.5a3 3 0 00-4.243 0L1.757 7A3 3 0 006 11.243L7 10.243" stroke="#2563EB" strokeWidth="1.4" strokeLinecap="round" />
+                        <path d="M5.5 7.5a3 3 0 004.243 0l1.5-1.5a3 3 0 00-4.243-4.243L6 2.757" stroke="#475569" strokeWidth="1.4" strokeLinecap="round" />
+                        <path d="M7.5 5.5a3 3 0 00-4.243 0L1.757 7A3 3 0 006 11.243L7 10.243" stroke="#475569" strokeWidth="1.4" strokeLinecap="round" />
                     </svg>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#2563EB" }}>Invite Link</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>Invite Link</span>
                 </div>
-                <p style={{ fontSize: 11.5, color: "#1D4ED8", lineHeight: 1.5, marginBottom: 10 }}>
+                <p style={{ fontSize: 11.5, color: "#64748B", lineHeight: 1.5, marginBottom: 10 }}>
                     Share this link — anyone who opens it while logged in will join this project automatically.
                 </p>
                 <div style={{ display: "flex", gap: 8 }}>
                     <div style={{
-                        flex: 1, padding: "8px 10px", background: "#fff", border: "1px solid #DBEAFE",
+                        flex: 1, padding: "8px 10px", background: "#fff", border: "1px solid #CBD5E1",
                         borderRadius: 8, fontSize: 11, color: "#6B7280",
                         overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>
@@ -217,7 +217,7 @@ export default function CollaboratorsModal({ project, user, onClose }) {
                     <button
                         onClick={handleCopyLink}
                         style={{
-                            padding: "8px 14px", background: copied ? "#059669" : "#2563EB",
+                            padding: "8px 14px", background: copied ? "#059669" : "#111218",
                             color: "#fff", border: "none", borderRadius: 8,
                             fontSize: 12, fontWeight: 700, cursor: "pointer",
                             flexShrink: 0, transition: "background .2s",

@@ -81,7 +81,7 @@ export default function TableView({ tasks, stages, onEdit }) {
                                     <td style={{ padding: "12px 14px" }}>
                                         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                                             {task.tags?.slice(0, 3).map((tag) => (
-                                                <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#EFF6FF", border: "1px solid rgba(37,99,235,.15)", color: "#2563EB", borderRadius: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{tag}</span>
+                                                <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#F1F5F9", border: "1px solid rgba(71,85,105,.15)", color: "#475569", borderRadius: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{tag}</span>
                                             ))}
                                         </div>
                                     </td>

@@ -48,7 +48,7 @@ function PriorityCard({ task, onEdit, stages, priorityColor, priorityBg, priorit
                     {getStageLabel(task.status)}
                 </span>
                 {task.tags?.slice(0, 2).map((tag) => (
-                    <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#EFF6FF", border: "1px solid rgba(37,99,235,.15)", color: "#2563EB", borderRadius: 4, fontWeight: 600 }}>{tag}</span>
+                    <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#F1F5F9", border: "1px solid rgba(71,85,105,.15)", color: "#475569", borderRadius: 4, fontWeight: 600 }}>{tag}</span>
                 ))}
                 {db && <span style={{ fontSize: 10.5, fontWeight: 600, marginLeft: "auto", color: db.type === "red" ? "#EF4444" : db.type === "orange" ? "#F59E0B" : "#22C55E" }}>{db.text}</span>}
             </div>
@@ -81,8 +81,8 @@ export default function PriorityView({ tasks, stages, onEdit, onPatchTask }) {
                         style={{
                             padding: 10,
                             borderRadius: 16,
-                            background: isOver ? "rgba(37,99,235,.03)" : "transparent",
-                            border: isOver ? "2px dashed #2563EB" : "2px dashed transparent",
+                            background: isOver ? "rgba(71,85,105,.03)" : "transparent",
+                            border: isOver ? "2px dashed #475569" : "2px dashed transparent",
                             transition: "all .2s"
                         }}
                     >

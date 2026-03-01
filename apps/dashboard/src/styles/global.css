@@ -151,20 +151,20 @@ input[type=number] {
 }
 
 .tag-hover:hover {
-    border-color: #2563EB !important;
-    color: #2563EB !important;
+    border-color: #475569 !important;
+    color: #475569 !important;
 }
 
 .add-idea-hover:hover {
-    border-color: #2563EB !important;
-    color: #2563EB !important;
-    background: #EFF6FF !important;
+    border-color: #475569 !important;
+    color: #475569 !important;
+    background: #F1F5F9 !important;
 }
 
 .col-add-hover:hover {
-    border-color: #2563EB !important;
-    background: #EFF6FF !important;
-    color: #2563EB !important;
+    border-color: #475569 !important;
+    background: #F1F5F9 !important;
+    color: #475569 !important;
 }
 
 .add-row-hover:hover {
@@ -175,20 +175,20 @@ input[type=number] {
 }
 
 .restore-hover:hover {
-    border-color: #2563EB !important;
-    background: #EFF6FF !important;
-    color: #2563EB !important;
+    border-color: #475569 !important;
+    background: #F1F5F9 !important;
+    color: #475569 !important;
 }
 
 .vote-hover:hover {
-    border-color: #2563EB !important;
-    background: #EFF6FF !important;
-    color: #2563EB !important;
+    border-color: #475569 !important;
+    background: #F1F5F9 !important;
+    color: #475569 !important;
 }
 
 .inp-focus:focus {
-    border-color: #2563EB !important;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, .12) !important;
+    border-color: #475569 !important;
+    box-shadow: 0 0 0 4px rgba(71, 85, 105, .12) !important;
 }
 
 .menu-hover:hover {

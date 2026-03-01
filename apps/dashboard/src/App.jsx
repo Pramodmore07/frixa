@@ -326,18 +326,26 @@ export default function App() {
   /* ── Ideas CRUD ── */
   const saveIdea = useCallback(async (form) => {
     if (form.id) {
+      // UPDATE — optimistic is safe for edits
       setIdeas((prev) => prev.map((x) => x.id === form.id ? { ...x, ...form } : x));
-      if (!guestMode && currentProject) await updateIdea(form.id, ideaToDb(form, user.id, currentProject.id));
-    } else {
-      const newIdea = { ...form, id: Date.now(), votes: 0, voted: false, createdAt: new Date().toLocaleDateString() };
-      setIdeas((prev) => [...prev, newIdea]);
       if (!guestMode && currentProject) {
-        const { error } = await insertIdea(ideaToDb(newIdea, user.id, currentProject.id));
-        if (error) showToast("Failed to save idea.");
+        const { error } = await updateIdea(form.id, ideaToDb(form, user.id, currentProject.id));
+        if (error) showToast("Failed to update idea.");
+      }
+      if (guestMode) guestSave(GUEST_IDEAS_KEY, ideas.map((x) => x.id === form.id ? { ...x, ...form } : x));
+    } else {
+      if (guestMode) {
+        const newIdea = { ...form, id: Date.now(), votes: 0, voted: false, createdAt: new Date().toLocaleDateString() };
+        setIdeas((prev) => { const next = [...prev, newIdea]; guestSave(GUEST_IDEAS_KEY, next); return next; });
+      } else if (currentProject) {
+        // DB mode: insert directly, let realtime push to all clients — no optimistic update
+        const ideaDb = ideaToDb({ ...form, votes: 0, voted: false }, user.id, currentProject.id);
+        const { error } = await insertIdea(ideaDb);
+        if (error) { showToast("Failed to save idea."); return; }
       }
     }
     setIdeaModal(null);
-  }, [guestMode, currentProject, user, showToast]);
+  }, [guestMode, currentProject, user, showToast, ideas]);
 
   const handleDeleteIdea = useCallback(async (id) => {
     setIdeas((prev) => prev.filter((x) => x.id !== id));

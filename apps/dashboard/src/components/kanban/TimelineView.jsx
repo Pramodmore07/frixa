@@ -157,15 +157,15 @@ export default function TimelineView({ tasks, stages, onEdit, onPatchTask }) {
                             <div style={{
                                 fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 700,
                                 padding: "4px 14px", borderRadius: 20,
-                                background: isCurrent ? "#111218" : isPast ? "#F3F4F6" : "#EFF6FF",
-                                color: isCurrent ? "#fff" : isPast ? "#9CA3AF" : "#2563EB",
+                                background: isCurrent ? "#111218" : isPast ? "#F3F4F6" : "#F1F5F9",
+                                color: isCurrent ? "#fff" : isPast ? "#9CA3AF" : "#475569",
                             }}>{getMonthLabel(key)}{isCurrent ? " · Now" : ""}</div>
                             <div style={{ flex: 1, height: 1, background: "#E8EAED" }} />
                             <span style={{ fontSize: 11, color: "#C4C9D4", fontWeight: 600 }}>{monthTasks.length} task{monthTasks.length !== 1 ? "s" : ""}</span>
                         </div>
 
                         {/* tasks in this month */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 14, borderLeft: `2px solid ${isCurrent ? "#2563EB" : "#E8EAED"}` }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 14, borderLeft: `2px solid ${isCurrent ? "#475569" : "#E8EAED"}` }}>
                             {monthTasks.map((task) => (
                                 <TimelineItem key={task.id} task={task} onEdit={onEdit} stages={stages} deadlineColor={deadlineColor} />
                             ))}

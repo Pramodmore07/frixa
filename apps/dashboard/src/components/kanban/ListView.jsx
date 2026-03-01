@@ -45,13 +45,13 @@ function ListRow({ task, i, isFirst, onEdit, onMove, colId }) {
                 padding: "12px 18px",
                 borderTop: isFirst ? "none" : "1px solid #F0F1F3",
                 borderLeft: ds !== "none" ? `3px solid ${DL_BORDER_COLOR[ds]}` : "3px solid transparent",
-                borderTopColor: dragState === "top" ? "#2563EB" : undefined,
-                borderBottomColor: dragState === "bottom" ? "#2563EB" : undefined,
+                borderTopColor: dragState === "top" ? "#475569" : undefined,
+                borderBottomColor: dragState === "bottom" ? "#475569" : undefined,
                 borderTopWidth: dragState === "top" ? 2 : undefined,
                 borderBottomWidth: dragState === "bottom" ? 2 : undefined,
                 cursor: "grab", transition: "background .12s, border .1s",
                 opacity: dragging ? 0.3 : 1,
-                background: dragState ? "rgba(37,99,235,.05)" : "transparent",
+                background: dragState ? "rgba(71,85,105,.05)" : "transparent",
             }}
             onMouseEnter={(e) => { if (!dragging) e.currentTarget.style.background = "#F8F9FA"; }}
             onMouseLeave={(e) => { if (!dragging) e.currentTarget.style.background = "transparent"; }}
@@ -76,7 +76,7 @@ function ListRow({ task, i, isFirst, onEdit, onMove, colId }) {
             {/* tags */}
             <div style={{ display: "flex", gap: 4 }}>
                 {task.tags?.slice(0, 2).map((tag) => (
-                    <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#EFF6FF", border: "1px solid rgba(37,99,235,.18)", color: "#2563EB", borderRadius: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{tag}</span>
+                    <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#F1F5F9", border: "1px solid rgba(71,85,105,.18)", color: "#475569", borderRadius: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{tag}</span>
                 ))}
             </div>
 

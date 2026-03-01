@@ -146,9 +146,9 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
             {/* ── New project form ── */}
             {creatingNew && (
                 <div style={{
-                    background: "#fff", border: "1.5px solid #DBEAFE", borderRadius: 18,
+                    background: "#fff", border: "1.5px solid #CBD5E1", borderRadius: 18,
                     padding: "20px 22px", marginBottom: 20,
-                    boxShadow: "0 4px 24px rgba(37,99,235,.08)",
+                    boxShadow: "0 4px 24px rgba(0,0,0,.07)",
                     animation: "fadeUp .2s cubic-bezier(.22,1,.36,1)",
                 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#111218", marginBottom: 12, fontFamily: "'Poppins',sans-serif" }}>Create New Project</div>
@@ -165,7 +165,7 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
                             outline: "none", boxSizing: "border-box", marginBottom: 10,
                             transition: "border-color .2s",
                         }}
-                        onFocus={(e) => { e.target.style.borderColor = "#2563EB"; }}
+                        onFocus={(e) => { e.target.style.borderColor = "#475569"; }}
                         onBlur={(e) => { e.target.style.borderColor = "#E8EAED"; }}
                     />
                     {createError && (
@@ -214,10 +214,10 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
                                 className="proj-card"
                                 style={{
                                     background: "#fff",
-                                    border: `1.5px solid ${isActive ? "#DBEAFE" : "#E8EAED"}`,
+                                    border: `1.5px solid ${isActive ? "#CBD5E1" : "#E8EAED"}`,
                                     borderRadius: 18,
                                     padding: "20px 22px",
-                                    boxShadow: isActive ? "0 4px 20px rgba(37,99,235,.08)" : "0 1px 3px rgba(0,0,0,.04)",
+                                    boxShadow: isActive ? "0 4px 20px rgba(0,0,0,.08)" : "0 1px 3px rgba(0,0,0,.04)",
                                     display: "flex", flexDirection: "column", gap: 14,
                                     transition: "border-color .15s, box-shadow .15s, transform .18s",
                                     position: "relative",
@@ -226,8 +226,8 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
                                 {/* Top row */}
                                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-                                        <div style={{ width: 38, height: 38, borderRadius: 11, background: isActive ? "#EFF6FF" : "#F4F5F7", border: `1.5px solid ${isActive ? "#DBEAFE" : "#E8EAED"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                            <div style={{ width: 10, height: 10, borderRadius: "50%", background: isActive ? "#2563EB" : "#9CA3AF" }} />
+                                        <div style={{ width: 38, height: 38, borderRadius: 11, background: isActive ? "#F1F5F9" : "#F4F5F7", border: `1.5px solid ${isActive ? "#CBD5E1" : "#E8EAED"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                            <div style={{ width: 10, height: 10, borderRadius: "50%", background: isActive ? "#475569" : "#9CA3AF" }} />
                                         </div>
                                         <div style={{ minWidth: 0 }}>
                                             <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 700, color: "#111218", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -239,7 +239,7 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
                                         </div>
                                     </div>
                                     {isActive && (
-                                        <span style={{ fontSize: 10, fontWeight: 700, color: "#2563EB", background: "#DBEAFE", borderRadius: 6, padding: "3px 8px", flexShrink: 0 }}>Active</span>
+                                        <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", background: "#E2E8F0", borderRadius: 6, padding: "3px 8px", flexShrink: 0 }}>Active</span>
                                     )}
                                 </div>
 
@@ -268,7 +268,7 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
                                             className="btn-hover-ink"
                                         >Switch to this project</button>
                                     ) : (
-                                        <div style={{ flex: 1, padding: "8px 0", textAlign: "center", fontSize: 12.5, fontWeight: 600, color: "#2563EB" }}>
+                                        <div style={{ flex: 1, padding: "8px 0", textAlign: "center", fontSize: 12.5, fontWeight: 600, color: "#475569" }}>
                                             Currently active
                                         </div>
                                     )}

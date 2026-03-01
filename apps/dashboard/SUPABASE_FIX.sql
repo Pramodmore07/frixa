@@ -134,15 +134,23 @@ CREATE POLICY "Members log activity" ON public.activity_log
 
 -- ── STEP 8: Fix profiles RLS ──────────────────────────────────────────────────
 DROP POLICY IF EXISTS "Users can view own profile"          ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile"        ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles"        ON public.profiles;
 DROP POLICY IF EXISTS "Members can view co-member profiles" ON public.profiles;
 
+-- Users can SELECT their own profile
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
+-- Users can UPDATE their own profile (needed for any profile settings changes)
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- Admins can SELECT all profiles (for admin panel)
 CREATE POLICY "Admins can view all profiles" ON public.profiles
   FOR SELECT USING (public.is_admin());
 
+-- Members can SELECT profiles of co-members (needed for CollaboratorsModal to show emails)
 CREATE POLICY "Members can view co-member profiles" ON public.profiles
   FOR SELECT USING (
     EXISTS (

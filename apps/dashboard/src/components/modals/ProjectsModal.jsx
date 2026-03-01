@@ -135,13 +135,13 @@ export default function ProjectsModal({ currentProject, onSwitch, onClose }) {
                                     style={{
                                         display: "flex", alignItems: "center", gap: 12,
                                         padding: "12px 14px", borderRadius: 14,
-                                        border: `1.5px solid ${isActive ? "#DBEAFE" : "#F0F1F3"}`,
-                                        background: isActive ? "#F0F6FF" : "#FAFAFA",
+                                        border: `1.5px solid ${isActive ? "#CBD5E1" : "#F0F1F3"}`,
+                                        background: isActive ? "#F8FAFC" : "#FAFAFA",
                                         transition: "border-color .15s, background .15s",
                                     }}
                                 >
                                     {/* Dot */}
-                                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: isActive ? "#2563EB" : "#D1D5DB", flexShrink: 0 }} />
+                                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: isActive ? "#475569" : "#D1D5DB", flexShrink: 0 }} />
 
                                     {/* Name + meta */}
                                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -157,7 +157,7 @@ export default function ProjectsModal({ currentProject, onSwitch, onClose }) {
 
                                     {/* Active badge */}
                                     {isActive && (
-                                        <span style={{ fontSize: 10, fontWeight: 700, color: "#2563EB", background: "#DBEAFE", borderRadius: 6, padding: "2px 8px", flexShrink: 0 }}>Active</span>
+                                        <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", background: "#E2E8F0", borderRadius: 6, padding: "2px 8px", flexShrink: 0 }}>Active</span>
                                     )}
 
                                     {/* Switch button */}
@@ -217,9 +217,9 @@ export default function ProjectsModal({ currentProject, onSwitch, onClose }) {
                                 }}
                                 placeholder="Project name…"
                                 style={{
-                                    width: "100%", padding: "10px 13px", border: "1.5px solid #DBEAFE",
+                                    width: "100%", padding: "10px 13px", border: "1.5px solid #CBD5E1",
                                     borderRadius: 10, fontSize: 13, fontFamily: "'Poppins',sans-serif",
-                                    fontWeight: 500, color: "#111218", background: "#F8FAFF",
+                                    fontWeight: 500, color: "#111218", background: "#F8FAFC",
                                     outline: "none", boxSizing: "border-box", marginBottom: 8,
                                 }}
                             />

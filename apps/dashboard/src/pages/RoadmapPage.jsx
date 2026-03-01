@@ -47,7 +47,7 @@ export default function RoadmapPage({
 
     const stats = [
         { label: "Total", val: active.length, color: "#111218", bg: "#F4F5F7", bdg: "transparent" },
-        { label: "Active", val: inFlight, color: "#2563EB", bg: "#EFF6FF", bdg: "#DBEAFE" },
+        { label: "Active", val: inFlight, color: "#475569", bg: "#F1F5F9", bdg: "#E2E8F0" },
         { label: "Done", val: done, color: "#059669", bg: "#ECFDF5", bdg: "#A7F3D0" },
         { label: "Overdue", val: overdue, color: "#DC2626", bg: "#FEF2F2", bdg: "#FECACA" },
     ];

@@ -29,8 +29,8 @@ export default function FocusTimer({ onDone }) {
 
     const isUrgent = running && remain <= 60;
     const isWarning = running && remain > 60 && remain <= 300;
-    const accent = isUrgent ? "#EF4444" : isWarning ? "#F59E0B" : "#2563EB";
-    const accentBg = isUrgent ? "rgba(239,68,68,.08)" : isWarning ? "rgba(245,158,11,.08)" : "rgba(37,99,235,.07)";
+    const accent = isUrgent ? "#EF4444" : isWarning ? "#F59E0B" : "#475569";
+    const accentBg = isUrgent ? "rgba(239,68,68,.08)" : isWarning ? "rgba(245,158,11,.08)" : "rgba(71,85,105,.07)";
 
     const start = () => {
         if (running) return;

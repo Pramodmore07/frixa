@@ -38,10 +38,10 @@ export default function IdeasPage({ ideas, onVote, onEdit, onAdd }) {
                                     className="vote-hover"
                                     style={{
                                         display: "flex", alignItems: "center", gap: 5, padding: "5px 13px",
-                                        borderRadius: 99, border: `1.5px solid ${idea.voted ? "#2563EB" : "#E8EAED"}`,
-                                        background: idea.voted ? "#EFF6FF" : "transparent",
+                                        borderRadius: 99, border: `1.5px solid ${idea.voted ? "#475569" : "#E8EAED"}`,
+                                        background: idea.voted ? "#F1F5F9" : "transparent",
                                         fontSize: 12, fontWeight: 600,
-                                        color: idea.voted ? "#2563EB" : "#6B7280",
+                                        color: idea.voted ? "#475569" : "#6B7280",
                                         cursor: "pointer", fontFamily: "'Poppins',sans-serif", transition: "all .15s",
                                     }}
                                 >👍 {idea.votes}</button>

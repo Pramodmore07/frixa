@@ -47,12 +47,12 @@ export default function TaskCard({ task, pos, colId, onEdit, onMove, onDuplicate
                 background: dragging ? "transparent" : "#fff",
                 border: "1px solid #E8EAED",
                 borderLeft: leftBorder,
-                borderTop: dragState === "top" ? "3px solid #2563EB" : undefined,
-                borderBottom: dragState === "bottom" ? "3px solid #2563EB" : undefined,
+                borderTop: dragState === "top" ? "3px solid #475569" : undefined,
+                borderBottom: dragState === "bottom" ? "3px solid #475569" : undefined,
                 borderRadius: 14, marginBottom: 12,
                 cursor: "grab", userSelect: "none",
                 opacity: dragging ? 0.3 : 1,
-                boxShadow: dragState ? "0 4px 12px rgba(37,99,235,.2)" : "0 2px 5px rgba(0,0,0,.03)",
+                boxShadow: dragState ? "0 4px 12px rgba(71,85,105,.2)" : "0 2px 5px rgba(0,0,0,.03)",
                 transition: "all .2s cubic-bezier(0.4, 0, 0.2, 1)",
                 display: "flex",
                 flexDirection: "column",
@@ -116,7 +116,7 @@ export default function TaskCard({ task, pos, colId, onEdit, onMove, onDuplicate
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", padding: "10px 16px 14px", background: "#FAFBFD", borderTop: "1px solid #F0F1F3" }}>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, flex: 1 }}>
                         {task.tags?.map((tag) => (
-                            <span key={tag} style={{ fontSize: 11, padding: "3px 10px", background: "#EFF6FF", border: "1px solid rgba(37,99,235,.12)", color: "#2563EB", borderRadius: 6, fontWeight: 600 }}>{tag}</span>
+                            <span key={tag} style={{ fontSize: 11, padding: "3px 10px", background: "#F1F5F9", border: "1px solid rgba(71,85,105,.15)", color: "#475569", borderRadius: 6, fontWeight: 600 }}>{tag}</span>
                         ))}
                     </div>
                     {task.priority && (() => {

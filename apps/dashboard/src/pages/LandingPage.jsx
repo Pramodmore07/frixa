@@ -59,9 +59,9 @@ export default function LandingPage({ onGetStarted }) {
             <header style={{ position: "relative", zIndex: 1, padding: "200px 20px 100px", textAlign: "center" }}>
                 <div style={{
                     display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px",
-                    background: "#F0F4FF", borderRadius: 100, marginBottom: 32, border: "1px solid #DBEAFE",
+                    background: "#F1F5F9", borderRadius: 100, marginBottom: 32, border: "1px solid #CBD5E1",
                 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#2563EB", background: "#fff", padding: "2px 7px", borderRadius: 100 }}>NEW</span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#475569", background: "#fff", padding: "2px 7px", borderRadius: 100 }}>NEW</span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: "#374151" }}>Cloud Workspaces is now in Beta</span>
                 </div>
 
@@ -114,7 +114,7 @@ export default function LandingPage({ onGetStarted }) {
             <section id="about" style={{ padding: "100px 24px", position: "relative", zIndex: 1 }}>
                 <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 72, alignItems: "center" }}>
                     <div style={{ position: "relative" }}>
-                        <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, background: "#DBEAFE", filter: "blur(80px)", borderRadius: "50%", zIndex: -1 }} />
+                        <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, background: "#E2E8F0", filter: "blur(80px)", borderRadius: "50%", zIndex: -1 }} />
                         <h2 style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-2px", lineHeight: 1.1, marginBottom: 28 }}>
                             A workspace that adapts to you.
                         </h2>
@@ -125,7 +125,7 @@ export default function LandingPage({ onGetStarted }) {
                                 { t: "Export Everything", d: "Own your data. Export roadmaps to CSV instantly." },
                             ].map((item, idx) => (
                                 <div key={idx} style={{ display: "flex", gap: 14 }}>
-                                    <div style={{ fontSize: 16, color: "#2563EB", fontWeight: 900, minWidth: 28 }}>0{idx + 1}</div>
+                                    <div style={{ fontSize: 16, color: "#475569", fontWeight: 900, minWidth: 28 }}>0{idx + 1}</div>
                                     <div>
                                         <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 3 }}>{item.t}</div>
                                         <div style={{ fontSize: 14, color: "#6B7280" }}>{item.d}</div>

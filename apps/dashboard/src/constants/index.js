@@ -5,7 +5,7 @@ export const CAT_COLORS = {
     product: { bg: "#EDE9FE", fg: "#5B21B6" },
     marketing: { bg: "#FEF9C3", fg: "#92400E" },
     growth: { bg: "#DCFCE7", fg: "#14532D" },
-    tech: { bg: "#DBEAFE", fg: "#1E40AF" },
+    tech: { bg: "#F1F5F9", fg: "#334155" },
     other: { bg: "#F3F4F6", fg: "#374151" },
 };
 
@@ -16,14 +16,14 @@ export const PRI_COLORS = {
 };
 
 export const DEFAULT_STAGES = [
-    { id: "planned", label: "Planned", dot: "#2563EB" },
+    { id: "planned", label: "Planned", dot: "#475569" },
     { id: "ongoing", label: "Ongoing", dot: "#10B981" },
     { id: "hold", label: "On Hold", dot: "#F59E0B" },
-    { id: "done", label: "Done", dot: "#8B5CF6" },
+    { id: "done", label: "Done", dot: "#374151" },
 ];
 
 export const DOT_PALETTE = [
-    "#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444",
+    "#475569", "#10B981", "#F59E0B", "#374151", "#EF4444",
     "#F97316", "#EC4899", "#0EA5E9", "#14B8A6", "#6B7280",
 ];
 
