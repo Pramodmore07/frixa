@@ -157,53 +157,79 @@ export default function App() {
     if (!user || !currentProject || guestMode) return;
     const pid = currentProject.id;
 
+    // Small debounce so rapid consecutive DB changes don't cause multiple fetches
+    let taskTimer, ideaTimer, stageTimer;
+
     const channel = supabase
       .channel(`project-${pid}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `project_id=eq.${pid}` },
-        () => fetchTasks(pid).then(({ data }) => { if (data) setTasks(data.map(dbToTask)); })
+        () => {
+          clearTimeout(taskTimer);
+          taskTimer = setTimeout(() => {
+            fetchTasks(pid).then(({ data }) => { if (data) setTasks(data.map(dbToTask)); });
+          }, 150);
+        }
       )
       .on("postgres_changes", { event: "*", schema: "public", table: "ideas", filter: `project_id=eq.${pid}` },
-        () => fetchIdeas(pid).then(({ data }) => { if (data) setIdeas(data.map(dbToIdea)); })
+        () => {
+          clearTimeout(ideaTimer);
+          ideaTimer = setTimeout(() => {
+            fetchIdeas(pid).then(({ data }) => { if (data) setIdeas(data.map(dbToIdea)); });
+          }, 150);
+        }
       )
       .on("postgres_changes", { event: "*", schema: "public", table: "stages", filter: `project_id=eq.${pid}` },
-        () => fetchStages(pid).then(({ data }) => { if (data?.length > 0) setStages(data.map(dbToStage)); })
+        () => {
+          clearTimeout(stageTimer);
+          stageTimer = setTimeout(() => {
+            fetchStages(pid).then(({ data }) => { if (data?.length > 0) setStages(data.map(dbToStage)); });
+          }, 150);
+        }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
-  }, [user, currentProject, guestMode]);
+    return () => {
+      clearTimeout(taskTimer); clearTimeout(ideaTimer); clearTimeout(stageTimer);
+      supabase.removeChannel(channel);
+    };
+  }, [user, currentProject?.id, guestMode]);
 
   const guestSave = (key, val) => ls.set(key, val);
 
   /* ── Task CRUD ── */
   const saveTask = useCallback(async (form) => {
     if (form.id) {
+      // UPDATE — optimistic update is safe, no tempId issue
       setTasks((prev) => { const next = prev.map((t) => t.id === form.id ? { ...t, ...form } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
       if (!guestMode && currentProject) {
         const { error } = await updateTask(form.id, taskToDb(form, user.id, currentProject.id));
         if (error) showToast("Failed to save task.");
-        else await logActivity(currentProject.id, user.id, "task_updated", { title: form.title });
+        // realtime will sync to other members
       }
     } else {
-      const newId = guestMode ? nextId : null;
-      if (guestMode) setNextId((n) => n + 1);
-      const tempId = Date.now();
-      setTasks((prev) => {
-        const colMax = prev.filter((t) => !t.archived && t.status === form.status).reduce((mx, t) => Math.max(mx, t.sortOrder ?? -1), -1);
-        const newTask = { ...form, id: guestMode ? newId : tempId, sortOrder: colMax + 1, archived: false };
-        const next = [...prev, newTask];
-        if (guestMode) guestSave(GUEST_TASKS_KEY, next);
-        return next;
-      });
-      if (!guestMode && currentProject) {
-        const { data, error } = await insertTask(taskToDb(form, user.id, currentProject.id));
+      if (guestMode) {
+        // Guest: use local nextId
+        const newId = nextId;
+        setNextId((n) => n + 1);
+        setTasks((prev) => {
+          const colMax = prev.filter((t) => !t.archived && t.status === form.status).reduce((mx, t) => Math.max(mx, t.sortOrder ?? -1), -1);
+          const newTask = { ...form, id: newId, sortOrder: colMax + 1, archived: false };
+          const next = [...prev, newTask];
+          guestSave(GUEST_TASKS_KEY, next);
+          return next;
+        });
+      } else if (currentProject) {
+        // DB mode: insert directly, let realtime subscription update ALL clients (including self)
+        // Do NOT do optimistic update — realtime fires immediately and would conflict
+        const colMax = tasks.filter((t) => !t.archived && t.status === form.status).reduce((mx, t) => Math.max(mx, t.sortOrder ?? -1), -1);
+        const taskDb = taskToDb({ ...form, sortOrder: colMax + 1 }, user.id, currentProject.id);
+        const { error } = await insertTask(taskDb);
         if (error) { showToast("Failed to create task."); return; }
-        setTasks((prev) => prev.map((t) => t.id === tempId ? dbToTask(data) : t));
-        await logActivity(currentProject.id, user.id, "task_created", { title: form.title });
+        // realtime postgres_changes will push the new task to all clients including this one
       }
     }
     setTaskModal(null);
-  }, [guestMode, nextId, user, currentProject, showToast]);
+  }, [guestMode, nextId, tasks, user, currentProject, showToast]);
 
   const patchTask = useCallback(async (id, patches) => {
     const dbPatches = {};
@@ -271,27 +297,21 @@ export default function App() {
   }, [guestMode, currentProject, user]);
 
   const duplicateTask = useCallback(async (task) => {
-    const tempId = Date.now();
-    const newTask = {
-      ...task,
-      id: guestMode ? nextId : tempId,
-      title: task.title + " (copy)",
-      archived: false,
-      sortOrder: (task.sortOrder ?? 0) + 1,
-    };
-    if (guestMode) setNextId((n) => n + 1);
-    setTasks((prev) => {
-      const next = [...prev, newTask];
-      if (guestMode) guestSave(GUEST_TASKS_KEY, next);
-      return next;
-    });
-    if (!guestMode && currentProject) {
-      const { data, error } = await insertTask(taskToDb(newTask, user.id, currentProject.id));
-      if (error) { showToast("Failed to duplicate task."); return; }
-      setTasks((prev) => prev.map((t) => t.id === tempId ? dbToTask(data) : t));
-      await logActivity(currentProject.id, user.id, "task_duplicated", { title: task.title });
+    if (guestMode) {
+      const newTask = { ...task, id: nextId, title: task.title + " (copy)", archived: false, sortOrder: (task.sortOrder ?? 0) + 1 };
+      setNextId((n) => n + 1);
+      setTasks((prev) => { const next = [...prev, newTask]; guestSave(GUEST_TASKS_KEY, next); return next; });
+      return;
     }
-    showToast(`"${task.title}" duplicated`, "success");
+    if (!currentProject) return;
+    // DB mode: insert directly, realtime will update all clients
+    const taskDb = taskToDb(
+      { ...task, title: task.title + " (copy)", sortOrder: (task.sortOrder ?? 0) + 1, archived: false },
+      user.id, currentProject.id
+    );
+    const { error } = await insertTask(taskDb);
+    if (error) showToast("Failed to duplicate task.");
+    // realtime fires for all clients — no manual state update needed
   }, [guestMode, nextId, user, currentProject, showToast]);
 
   /* ── Ideas CRUD ── */

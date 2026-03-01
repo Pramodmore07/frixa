@@ -167,13 +167,11 @@ CREATE POLICY "Members can see co-members" ON project_members
 DROP POLICY IF EXISTS "Members manage stages" ON stages;
 CREATE POLICY "Members manage stages" ON stages
   USING (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   )
   WITH CHECK (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   );
 
@@ -181,13 +179,11 @@ CREATE POLICY "Members manage stages" ON stages
 DROP POLICY IF EXISTS "Members manage tasks" ON tasks;
 CREATE POLICY "Members manage tasks" ON tasks
   USING (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   )
   WITH CHECK (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   );
 
@@ -195,13 +191,11 @@ CREATE POLICY "Members manage tasks" ON tasks
 DROP POLICY IF EXISTS "Members manage ideas" ON ideas;
 CREATE POLICY "Members manage ideas" ON ideas
   USING (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   )
   WITH CHECK (
-    auth.uid() = user_id
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   );
 
@@ -209,14 +203,16 @@ CREATE POLICY "Members manage ideas" ON ideas
 DROP POLICY IF EXISTS "Members view activity" ON activity_log;
 CREATE POLICY "Members view activity" ON activity_log
   FOR SELECT USING (
-    public.is_project_owner(project_id)
-    OR public.is_project_member(project_id)
+    public.is_project_member(project_id)
     OR public.is_admin()
   );
 
 DROP POLICY IF EXISTS "Members log activity" ON activity_log;
 CREATE POLICY "Members log activity" ON activity_log
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  FOR INSERT WITH CHECK (
+    public.is_project_member(project_id)
+    OR public.is_admin()
+  );
 
 -- profiles
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
