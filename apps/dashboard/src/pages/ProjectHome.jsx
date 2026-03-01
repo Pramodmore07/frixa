@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { fetchProjects, createProject } from "../lib/api";
 import { Btn, Input, FG } from "../components/ui";
 
+const RECENT_LIMIT = 5;
+
 export default function ProjectHome({ user, onSelectProject }) {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -9,11 +11,16 @@ export default function ProjectHome({ user, onSelectProject }) {
     const [saving, setSaving] = useState(false);
     const [createError, setCreateError] = useState("");
     const [newName, setNewName] = useState("");
+    const [showAll, setShowAll] = useState(false);
 
     const loadProjects = async () => {
         setLoading(true);
         const { data, error } = await fetchProjects();
-        if (!error && data) setProjects(data);
+        if (!error && data) {
+            // Sort newest first
+            const sorted = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            setProjects(sorted);
+        }
         setLoading(false);
     };
 
@@ -47,6 +54,9 @@ export default function ProjectHome({ user, onSelectProject }) {
         );
     }
 
+    const displayed = showAll ? projects : projects.slice(0, RECENT_LIMIT);
+    const hasMore = projects.length > RECENT_LIMIT;
+
     return (
         <div style={{
             minHeight: "100vh", background: "linear-gradient(145deg,#F4F5F7 0%,#FAFAFA 55%,#F1F5F9 100%)",
@@ -59,37 +69,89 @@ export default function ProjectHome({ user, onSelectProject }) {
                     <p style={{ fontSize: 13.5, color: "#6B7280" }}>Select an existing project or create a new one to start collaborating.</p>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+                {/* Section label */}
+                {projects.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, color: "#9CA3AF", letterSpacing: ".06em", textTransform: "uppercase", fontFamily: "'Poppins',sans-serif" }}>
+                            Recent Projects
+                        </span>
+                        <span style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "'Poppins',sans-serif" }}>
+                            {projects.length} total
+                        </span>
+                    </div>
+                )}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                     {projects.length === 0 ? (
                         <p style={{ textAlign: "center", padding: "20px 0", color: "#9CA3AF", fontSize: 13, fontStyle: "italic", background: "#F9FAFB", borderRadius: 16, border: "1.5px dashed #E8EAED" }}>
                             No projects found. Create your first one below!
                         </p>
                     ) : (
-                        projects.map(p => (
+                        displayed.map(p => (
                             <div
                                 key={p.id}
                                 onClick={() => onSelectProject(p)}
                                 style={{
-                                    padding: "16px 20px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 16,
+                                    padding: "14px 18px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 14,
                                     cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
                                     transition: "all .15s"
                                 }}
                                 className="project-card-hover"
                             >
-                                <div>
-                                    <div style={{ fontWeight: 700, fontSize: 15, color: "#111218" }}>{p.name}</div>
-                                    <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>{p.owner_id === user.id ? "Owner" : "Member"}</div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 9, background: "#fff", border: "1.5px solid #E8EAED", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#9CA3AF" }} />
+                                    </div>
+                                    <div style={{ minWidth: 0 }}>
+                                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "#111218", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                                        <div style={{ fontSize: 10.5, color: "#9CA3AF", marginTop: 1 }}>
+                                            {p.owner_id === user.id ? "Owner" : "Member"} · {new Date(p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                        </div>
+                                    </div>
                                 </div>
-                                <span style={{ color: "#C4C9D4" }}>→</span>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "#C4C9D4", flexShrink: 0 }}>
+                                    <path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
                             </div>
                         ))
                     )}
                 </div>
 
-                <div style={{ height: 1, background: "#E8EAED", margin: "0 -40px 32px" }} />
+                {/* See all / Collapse toggle */}
+                {hasMore && (
+                    <button
+                        onClick={() => setShowAll(v => !v)}
+                        style={{
+                            width: "100%", padding: "9px 0", border: "1.5px solid #E8EAED",
+                            borderRadius: 12, background: "transparent", fontFamily: "'Poppins',sans-serif",
+                            fontSize: 12.5, fontWeight: 600, color: "#6B7280", cursor: "pointer",
+                            marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                            transition: "all .15s",
+                        }}
+                        className="see-all-btn"
+                    >
+                        {showAll ? (
+                            <>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M2 8L6 4l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                Show less
+                            </>
+                        ) : (
+                            <>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                See all {projects.length} projects
+                            </>
+                        )}
+                    </button>
+                )}
+
+                <div style={{ height: 1, background: "#E8EAED", margin: `0 -40px ${hasMore ? "20" : "32"}px` }} />
 
                 {creating ? (
-                    <div style={{ animation: "fadeUp .22s ease-out" }}>
+                    <div style={{ animation: "fadeUp .22s ease-out", marginTop: hasMore ? 0 : 8 }}>
                         <FG label="Project Name">
                             <Input
                                 value={newName}
@@ -118,7 +180,7 @@ export default function ProjectHome({ user, onSelectProject }) {
                         style={{
                             width: "100%", padding: "14px", background: "#111218", color: "#fff", border: "none", borderRadius: 14,
                             fontFamily: "'Poppins',sans-serif", fontSize: 14, fontWeight: 700, cursor: "pointer",
-                            boxShadow: "0 4px 18px rgba(17,18,24,.15)"
+                            boxShadow: "0 4px 18px rgba(17,18,24,.15)", marginTop: hasMore ? 0 : 8,
                         }}
                     >
                         + Create New Project
@@ -132,6 +194,7 @@ export default function ProjectHome({ user, onSelectProject }) {
                     transform: translateY(-2px);
                     box-shadow: 0 8px 24px rgba(71,85,105,.1);
                 }
+                .see-all-btn:hover { background: #F4F5F7 !important; color: #374151 !important; }
                 @keyframes fadeUp {
                     from { opacity: 0; transform: translateY(10px); }
                     to { opacity: 1; transform: translateY(0); }

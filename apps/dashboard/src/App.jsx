@@ -32,6 +32,10 @@ const GUEST_TASKS_KEY = "guest_tasks_v1";
 const GUEST_IDEAS_KEY = "guest_ideas_v1";
 const GUEST_STAGES_KEY = "guest_stages_v1";
 const GUEST_SETTINGS_KEY = "guest_settings_v1";
+const SESSION_PROJECT_KEY = "session_project_id_v1";
+const SESSION_PAGE_KEY = "session_page_v1";
+
+const VALID_PAGES = ["roadmap", "ideas", "archive", "projects"];
 
 const DEFAULT_SETTINGS = { showTimer: false };
 
@@ -48,7 +52,10 @@ export default function App() {
   const [guestMode, setGuestMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [page, setPage] = useState("roadmap");
+  const [page, setPage] = useState(() => {
+    const saved = ls.get(SESSION_PAGE_KEY, "roadmap");
+    return VALID_PAGES.includes(saved) ? saved : "roadmap";
+  });
   const [tasks, setTasks] = useState([]);
   const [ideas, setIdeas] = useState([]);
   const [stages, setStages] = useState(DEFAULT_STAGES);
@@ -85,6 +92,8 @@ export default function App() {
   const exitGuestMode = useCallback(() => {
     setGuestMode(false);
     setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setCurrentProject(null);
+    ls.set(SESSION_PROJECT_KEY, null);
+    ls.set(SESSION_PAGE_KEY, "roadmap");
   }, []);
 
   /* ── Supabase auth ── */
@@ -106,10 +115,35 @@ export default function App() {
       }
       if (event === "SIGNED_OUT") {
         setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setCurrentProject(null); setLoading(false);
+        ls.set(SESSION_PROJECT_KEY, null);
+        ls.set(SESSION_PAGE_KEY, "roadmap");
       }
     });
     return () => { subscription.unsubscribe(); clearTimeout(timeout); };
   }, []);
+
+  /* ── Persist page to localStorage whenever it changes ── */
+  useEffect(() => {
+    if (!guestMode) ls.set(SESSION_PAGE_KEY, page);
+  }, [page, guestMode]);
+
+  /* ── Restore last project from localStorage after auth resolves ── */
+  useEffect(() => {
+    if (!user || guestMode) return;
+    const savedId = ls.get(SESSION_PROJECT_KEY, null);
+    if (!savedId || currentProject) return; // already have a project (e.g. invite link set it)
+    fetchProjectById(savedId).then(({ data }) => {
+      if (data) setCurrentProject(data);
+    });
+  }, [user, guestMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── Persist current project id to localStorage ── */
+  useEffect(() => {
+    if (!guestMode) {
+      if (currentProject?.id) ls.set(SESSION_PROJECT_KEY, currentProject.id);
+      else ls.set(SESSION_PROJECT_KEY, null);
+    }
+  }, [currentProject, guestMode]);
 
   /* ── Handle invite link: ?invite=<projectId> ── */
   useEffect(() => {
