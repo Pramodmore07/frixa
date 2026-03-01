@@ -72,50 +72,11 @@ export function dbToStage(row) {
    PROJECTS & COLLABORATION
 ══════════════════════════════════════════════════════ */
 export async function fetchProjects() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { data: [], error: null };
-
-    // Step 1: Get project_ids from project_members for this user
-    const { data: memberRows, error: memberErr } = await supabase
-        .from("project_members")
-        .select("project_id")
-        .eq("user_id", user.id);
-
-    if (memberErr) return { data: [], error: memberErr };
-
-    let projectIds = (memberRows || []).map((r) => r.project_id);
-
-    // Step 2: Fallback — also find projects this user owns directly (in case
-    // owner was never inserted into project_members for older projects)
-    const { data: ownedProjects } = await supabase
-        .from("projects")
-        .select("id")
-        .eq("owner_id", user.id);
-
-    const ownedIds = (ownedProjects || []).map((p) => p.id);
-
-    // Merge and deduplicate
-    const allIds = [...new Set([...projectIds, ...ownedIds])];
-
-    // Step 3: Back-fill project_members for any owned projects missing an owner row
-    for (const pid of ownedIds) {
-        if (!projectIds.includes(pid)) {
-            await supabase
-                .from("project_members")
-                .insert({ project_id: pid, user_id: user.id, role: "owner" })
-                .select()
-                .single();
-            // Ignore duplicate errors (23505) silently
-        }
-    }
-
-    if (allIds.length === 0) return { data: [], error: null };
-
-    return supabase
-        .from("projects")
-        .select("*, project_members(*)")
-        .in("id", allIds)
-        .order("created_at");
+    // Use the SECURITY DEFINER RPC — bypasses all RLS, no recursion, works for
+    // every user (owner AND invited members).
+    const { data, error } = await supabase.rpc("get_my_projects");
+    if (error) return { data: [], error };
+    return { data: data || [], error: null };
 }
 
 export async function createProject(name, ownerId) {

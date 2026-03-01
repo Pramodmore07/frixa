@@ -50,18 +50,10 @@ export default function LoginScreen({ onGuestMode }) {
             } else {
                 const { error: err } = await supabase.auth.signInWithPassword({ email, password });
                 if (err) {
-                    if (err.message.toLowerCase().includes("invalid login credentials")) {
-                        const { error: upErr } = await supabase.auth.signUp({
-                            email, password,
-                            options: { emailRedirectTo: appUrl },
-                        });
-                        if (upErr) {
-                            setError(upErr.message.includes("already registered")
-                                ? "Not verified yet? Check your inbox for a confirmation link."
-                                : upErr.message);
-                        } else {
-                            setInfo("✅ Account created. Check your inbox to verify, then sign in.");
-                        }
+                    if (err.message.toLowerCase().includes("email not confirmed")) {
+                        setError("Please verify your email first. Check your inbox for a confirmation link.");
+                    } else if (err.message.toLowerCase().includes("invalid login credentials")) {
+                        setError("Wrong email or password. Don't have an account? Click Sign up below.");
                     } else {
                         setError(err.message);
                     }
@@ -77,9 +69,9 @@ export default function LoginScreen({ onGuestMode }) {
         <div style={{
             position: "fixed", inset: 0, zIndex: 9999,
             display: "flex", alignItems: "center", justifyContent: "center",
-            background: "linear-gradient(145deg,#EFF6FF 0%,#F4F5F7 55%,#F0FDF4 100%)",
+            background: "linear-gradient(145deg,#F4F5F7 0%,#FAFAFA 55%,#F1F5F9 100%)",
         }}>
-            <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 55% 45% at 18% 18%, rgba(37,99,235,.11) 0%, transparent 70%), radial-gradient(ellipse 45% 38% at 82% 82%, rgba(16,185,129,.08) 0%, transparent 70%)" }} />
+            <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 55% 45% at 18% 18%, rgba(71,85,105,.07) 0%, transparent 70%), radial-gradient(ellipse 45% 38% at 82% 82%, rgba(100,116,139,.05) 0%, transparent 70%)" }} />
 
             <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", width: 420, animation: "fadeUp .65s cubic-bezier(.22,1,.36,1) both" }}>
                 {/* Logo */}
@@ -113,7 +105,7 @@ export default function LoginScreen({ onGuestMode }) {
                         className="google-btn"
                     >
                         {googleLoading
-                            ? <><span style={{ width: 16, height: 16, border: "2px solid #D1D5DB", borderTop: "2px solid #2563EB", borderRadius: "50%", display: "inline-block", animation: "spin .7s linear infinite" }} /> Redirecting…</>
+                            ? <><span style={{ width: 16, height: 16, border: "2px solid #D1D5DB", borderTop: "2px solid #475569", borderRadius: "50%", display: "inline-block", animation: "spin .7s linear infinite" }} /> Redirecting…</>
                             : <><GoogleIcon /> Continue with Google</>
                         }
                     </button>
@@ -154,7 +146,7 @@ export default function LoginScreen({ onGuestMode }) {
                     <p style={{ marginTop: 18, fontSize: 12.5, color: "#9CA3AF" }}>
                         {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
                         <button onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); setInfo(""); }}
-                            style={{ border: "none", background: "transparent", color: "#2563EB", fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif", fontSize: 12.5 }}>
+                            style={{ border: "none", background: "transparent", color: "#475569", fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif", fontSize: 12.5 }}>
                             {mode === "signin" ? "Sign up" : "Sign in"}
                         </button>
                     </p>
@@ -171,7 +163,7 @@ export default function LoginScreen({ onGuestMode }) {
             </div>
             <style>{`
                 @keyframes spin { to { transform: rotate(360deg); } }
-                .google-btn:hover:not(:disabled) { background: #F8F9FF !important; border-color: #2563EB !important; box-shadow: 0 3px 12px rgba(37,99,235,.12) !important; }
+                .google-btn:hover:not(:disabled) { background: #F4F5F7 !important; border-color: #475569 !important; box-shadow: 0 3px 12px rgba(71,85,105,.1) !important; }
             `}</style>
         </div>
     );
