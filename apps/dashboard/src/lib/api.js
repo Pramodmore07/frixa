@@ -72,12 +72,10 @@ export function dbToStage(row) {
    PROJECTS & COLLABORATION
 ══════════════════════════════════════════════════════ */
 export async function fetchProjects() {
-    // Fetch all projects the user owns OR is a member of.
-    // We query project_members for the current user first, then fetch those projects.
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { data: [], error: null };
 
-    // Get all project_ids where this user is a member (includes owner row)
+    // Step 1: Get project_ids from project_members for this user
     const { data: memberRows, error: memberErr } = await supabase
         .from("project_members")
         .select("project_id")
@@ -85,18 +83,56 @@ export async function fetchProjects() {
 
     if (memberErr) return { data: [], error: memberErr };
 
-    const projectIds = (memberRows || []).map((r) => r.project_id);
-    if (projectIds.length === 0) return { data: [], error: null };
+    let projectIds = (memberRows || []).map((r) => r.project_id);
+
+    // Step 2: Fallback — also find projects this user owns directly (in case
+    // owner was never inserted into project_members for older projects)
+    const { data: ownedProjects } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("owner_id", user.id);
+
+    const ownedIds = (ownedProjects || []).map((p) => p.id);
+
+    // Merge and deduplicate
+    const allIds = [...new Set([...projectIds, ...ownedIds])];
+
+    // Step 3: Back-fill project_members for any owned projects missing an owner row
+    for (const pid of ownedIds) {
+        if (!projectIds.includes(pid)) {
+            await supabase
+                .from("project_members")
+                .insert({ project_id: pid, user_id: user.id, role: "owner" })
+                .select()
+                .single();
+            // Ignore duplicate errors (23505) silently
+        }
+    }
+
+    if (allIds.length === 0) return { data: [], error: null };
 
     return supabase
         .from("projects")
         .select("*, project_members(*)")
-        .in("id", projectIds)
+        .in("id", allIds)
         .order("created_at");
 }
 
 export async function createProject(name, ownerId) {
-    return supabase.from("projects").insert({ name, owner_id: ownerId }).select().single();
+    // 1. Create the project
+    const { data, error } = await supabase
+        .from("projects")
+        .insert({ name, owner_id: ownerId })
+        .select()
+        .single();
+    if (error || !data) return { data, error };
+
+    // 2. Add the owner as a member so fetchProjects (which queries project_members) can find it
+    await supabase
+        .from("project_members")
+        .insert({ project_id: data.id, user_id: ownerId, role: "owner" });
+
+    return { data, error: null };
 }
 
 export async function deleteProject(projectId) {
