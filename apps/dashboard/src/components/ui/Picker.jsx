@@ -74,20 +74,23 @@ export function IOSDatePicker({ value, onChange }) {
         return cells;
     };
 
-    const displayValue = value ? new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "Pick a date";
+    const displayValue = value
+        ? new Date(value + "T00:00:00").toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        : "Pick a date";
 
     return (
         <div ref={ref} style={{ position: "relative", width: "100%" }}>
             <div
                 onClick={() => setOpen(!open)}
                 style={{
-                    padding: "10px 14px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 12,
-                    display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer",
-                    fontFamily: "'Poppins',sans-serif", fontSize: 14, color: value ? "#111218" : "#9CA3AF"
+                    padding: "10px 12px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 12,
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6,
+                    cursor: "pointer", fontFamily: "'Poppins',sans-serif", fontSize: 13,
+                    color: value ? "#111218" : "#9CA3AF", minWidth: 0,
                 }}
             >
-                <span>{displayValue}</span>
-                <span style={{ fontSize: 16 }}>🗓️</span>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{displayValue}</span>
+                <span style={{ fontSize: 15, flexShrink: 0 }}>🗓️</span>
             </div>
 
             {open && (
@@ -144,7 +147,16 @@ export function IOSTimePicker({ value, onChange }) {
         setOpen(false);
     };
 
-    const displayValue = value ? value : "Set time";
+    // Format 24h to 12h display e.g. "14:30" → "2:30 PM"
+    const formatDisplay = (v) => {
+        if (!v) return "Set time";
+        const [hStr, mStr] = v.split(":");
+        const h = parseInt(hStr, 10);
+        const m = mStr;
+        const ampm = h >= 12 ? "PM" : "AM";
+        const h12 = h % 12 === 0 ? 12 : h % 12;
+        return `${h12}:${m} ${ampm}`;
+    };
 
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const minutes = [0, 15, 30, 45];
@@ -154,42 +166,49 @@ export function IOSTimePicker({ value, onChange }) {
             <div
                 onClick={() => setOpen(!open)}
                 style={{
-                    padding: "10px 14px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 12,
-                    display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer",
-                    fontFamily: "'Poppins',sans-serif", fontSize: 14, color: value ? "#111218" : "#9CA3AF"
+                    padding: "10px 12px", background: "#F4F5F7", border: "1.5px solid #E8EAED", borderRadius: 12,
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6,
+                    cursor: "pointer", fontFamily: "'Poppins',sans-serif", fontSize: 13,
+                    color: value ? "#111218" : "#9CA3AF", minWidth: 0,
                 }}
             >
-                <span>{displayValue}</span>
-                <span style={{ fontSize: 16 }}>🕒</span>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{formatDisplay(value)}</span>
+                <span style={{ fontSize: 15, flexShrink: 0 }}>🕒</span>
             </div>
 
             {open && (
                 <div style={{
                     position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 1000,
                     background: "#fff", border: "1px solid #E8EAED", borderRadius: 20,
-                    padding: 12, width: 220, boxShadow: "0 12px 40px rgba(0,0,0,.12)",
+                    padding: 12, width: 240, boxShadow: "0 12px 40px rgba(0,0,0,.12)",
                     animation: "pickerIn .2s cubic-bezier(.22,1,.36,1)"
                 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", marginBottom: 10, paddingLeft: 6 }}>Select Time</div>
-                    <div style={{ maxHeight: 200, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10, paddingLeft: 4 }}>Select Time</div>
+                    <div style={{ maxHeight: 220, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                         {hours.map(h => (
                             <div key={h} style={{ display: "contents" }}>
                                 {minutes.map(m => {
                                     const t = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                                     const isSelected = value === t;
+                                    const ampm = h >= 12 ? "PM" : "AM";
+                                    const h12 = h % 12 === 0 ? 12 : h % 12;
+                                    const label = `${h12}:${String(m).padStart(2, '0')}`;
+                                    const sublabel = m === 0 ? ampm : "";
                                     return (
                                         <div
                                             key={`${h}-${m}`}
                                             onClick={(e) => { e.stopPropagation(); handleSelect(h, m); }}
                                             style={{
-                                                padding: "6px 0", textAlign: "center", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600,
-                                                background: isSelected ? "#007AFF" : "#F2F2F7",
+                                                padding: "6px 2px", textAlign: "center", borderRadius: 8, cursor: "pointer",
+                                                background: isSelected ? "#111218" : "#F2F2F7",
                                                 color: isSelected ? "#fff" : "#111218",
+                                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                                             }}
                                             onMouseEnter={(e) => !isSelected && (e.currentTarget.style.background = "#E5E5EA")}
                                             onMouseLeave={(e) => !isSelected && (e.currentTarget.style.background = "#F2F2F7")}
                                         >
-                                            {t}
+                                            <span style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.2 }}>{label}</span>
+                                            {sublabel && <span style={{ fontSize: 8.5, fontWeight: 700, opacity: .6, letterSpacing: ".04em" }}>{sublabel}</span>}
                                         </div>
                                     );
                                 })}

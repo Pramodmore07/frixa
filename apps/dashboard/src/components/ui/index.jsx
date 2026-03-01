@@ -120,12 +120,13 @@ export function Modal({ children, onClose, title }) {
                 position: "fixed", inset: 0, zIndex: 500,
                 background: "rgba(10,12,18,.42)", backdropFilter: "blur(7px)",
                 display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "0 16px",
             }}
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div style={{
                 background: "#fff", border: "1px solid #E8EAED", borderRadius: 24,
-                padding: 32, width: 488, maxHeight: "88vh", overflowY: "auto",
+                padding: 32, width: "min(540px, 100%)", maxHeight: "88vh", overflowY: "auto",
                 boxShadow: "0 28px 72px rgba(0,0,0,.15)",
                 animation: "scaleIn .22s cubic-bezier(.22,1,.36,1)",
             }}>
