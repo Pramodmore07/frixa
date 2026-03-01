@@ -360,16 +360,6 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                 {/* Action button (New Task / New Idea) */}
                 {actionBtn}
 
-                {/* Settings gear icon */}
-                <button
-                    onClick={onSettings}
-                    title="Settings"
-                    style={{ width: 38, height: 38, border: "1.5px solid #E8EAED", borderRadius: 11, background: "transparent", color: "#6B7280", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s" }}
-                    className="nav-btn"
-                >
-                    <GearIcon size={17} />
-                </button>
-
                 {/* Profile avatar + dropdown */}
                 <div ref={profileRef} style={{ position: "relative" }}>
                     <button
@@ -449,10 +439,11 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                                         Invite Members
                                     </button>
                                 )}
-                                <button onClick={() => { onSettings(); setProfileOpen(false); }} className="profile-menu-item"
-                                    style={{ width: "100%", padding: "9px 14px", border: "none", borderRadius: 10, background: "transparent", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 10, fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 500, color: "#374151", transition: "background .12s" }}>
-                                    <span style={{ color: "#9CA3AF", display: "flex" }}><GearIcon size={14} /></span>
+                                <button onClick={() => { setPage("settings"); setProfileOpen(false); }} className="profile-menu-item"
+                                    style={{ width: "100%", padding: "9px 14px", border: "none", borderRadius: 10, background: page === "settings" ? "#F1F5F9" : "transparent", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 10, fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: page === "settings" ? 600 : 500, color: page === "settings" ? "#111218" : "#374151", transition: "background .12s" }}>
+                                    <span style={{ color: page === "settings" ? "#475569" : "#9CA3AF", display: "flex" }}><GearIcon size={14} /></span>
                                     Settings
+                                    {page === "settings" && <span style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: "#475569" }} />}
                                 </button>
                             </div>
 

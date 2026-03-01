@@ -27,6 +27,7 @@ import RoadmapPage from "./pages/RoadmapPage";
 import IdeasPage from "./pages/IdeasPage";
 import ArchivePage from "./pages/ArchivePage";
 import ProjectsPage from "./pages/ProjectsPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const GUEST_TASKS_KEY = "guest_tasks_v1";
 const GUEST_IDEAS_KEY = "guest_ideas_v1";
@@ -35,7 +36,7 @@ const GUEST_SETTINGS_KEY = "guest_settings_v1";
 const SESSION_PROJECT_KEY = "session_project_id_v1";
 const SESSION_PAGE_KEY = "session_page_v1";
 
-const VALID_PAGES = ["roadmap", "ideas", "archive", "projects"];
+const VALID_PAGES = ["roadmap", "ideas", "archive", "projects", "settings"];
 
 const DEFAULT_SETTINGS = { showTimer: false };
 
@@ -482,7 +483,7 @@ export default function App() {
         onShowActivity={() => setActivityOpen(!activityOpen)}
         onNewTask={() => setTaskModal({ mode: "add", data: { status: stages[0]?.id ?? "planned" } })}
         onNewIdea={() => setIdeaModal({ mode: "add", data: {} })}
-        onSettings={() => setSettingsOpen(true)}
+        onSettings={() => setPage("settings")}
         onSignOut={guestMode ? exitGuestMode : () => supabase.auth.signOut()}
       />
 
@@ -516,6 +517,18 @@ export default function App() {
             user={user}
             onSwitch={handleSwitchProject}
             onCreateProject={handleSwitchProject}
+          />
+        )}
+        {page === "settings" && (
+          <SettingsPage
+            user={user}
+            guestMode={guestMode}
+            settings={settings}
+            onSave={saveSettings}
+            stages={stages}
+            tasks={tasks}
+            onSaveStages={saveStages}
+            onDeleteStage={removeStage}
           />
         )}
       </div>
