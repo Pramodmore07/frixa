@@ -228,13 +228,23 @@ export default function App() {
           return next;
         });
       } else if (currentProject) {
-        // DB mode: insert directly, let realtime subscription update ALL clients (including self)
-        // Do NOT do optimistic update — realtime fires immediately and would conflict
+        // DB mode: insert and get back the real row (with server-generated UUID).
+        // Add it to local state immediately so the creator sees it without waiting for realtime.
+        // Realtime will still fire for ALL other clients (~150ms later).
+        // When realtime fires for the creator too, the dedup-by-id prevents duplicates.
         const colMax = tasks.filter((t) => !t.archived && t.status === form.status).reduce((mx, t) => Math.max(mx, t.sortOrder ?? -1), -1);
         const taskDb = taskToDb({ ...form, sortOrder: colMax + 1 }, user.id, currentProject.id);
-        const { error } = await insertTask(taskDb);
+        const { data: inserted, error } = await insertTask(taskDb);
         if (error) { showToast("Failed to create task."); return; }
-        // realtime postgres_changes will push the new task to all clients including this one
+        if (inserted) {
+          const newTask = dbToTask(inserted);
+          setTasks((prev) => {
+            // Deduplicate: don't add if realtime already pushed it
+            if (prev.some((t) => t.id === newTask.id)) return prev;
+            return [...prev, newTask];
+          });
+          showToast("Task created!", "success");
+        }
       }
     }
     setTaskModal(null);
@@ -312,15 +322,23 @@ export default function App() {
       setTasks((prev) => { const next = [...prev, newTask]; guestSave(GUEST_TASKS_KEY, next); return next; });
       return;
     }
-    if (!currentProject) return;
-    // DB mode: insert directly, realtime will update all clients
+    if (!currentProject || !user) return;
+    // DB mode: insert and immediately add to local state using real returned row.
+    // Realtime will also fire for other clients.
     const taskDb = taskToDb(
       { ...task, title: task.title + " (copy)", sortOrder: (task.sortOrder ?? 0) + 1, archived: false },
       user.id, currentProject.id
     );
-    const { error } = await insertTask(taskDb);
-    if (error) showToast("Failed to duplicate task.");
-    // realtime fires for all clients — no manual state update needed
+    const { data: inserted, error } = await insertTask(taskDb);
+    if (error) { showToast("Failed to duplicate task."); return; }
+    if (inserted) {
+      const newTask = dbToTask(inserted);
+      setTasks((prev) => {
+        if (prev.some((t) => t.id === newTask.id)) return prev;
+        return [...prev, newTask];
+      });
+      showToast(`"${task.title}" duplicated!`, "success");
+    }
   }, [guestMode, nextId, user, currentProject, showToast]);
 
   /* ── Ideas CRUD ── */
@@ -338,10 +356,19 @@ export default function App() {
         const newIdea = { ...form, id: Date.now(), votes: 0, voted: false, createdAt: new Date().toLocaleDateString() };
         setIdeas((prev) => { const next = [...prev, newIdea]; guestSave(GUEST_IDEAS_KEY, next); return next; });
       } else if (currentProject) {
-        // DB mode: insert directly, let realtime push to all clients — no optimistic update
+        // DB mode: insert and immediately add to local state using the returned row.
+        // Realtime will also fire for other clients.
         const ideaDb = ideaToDb({ ...form, votes: 0, voted: false }, user.id, currentProject.id);
-        const { error } = await insertIdea(ideaDb);
+        const { data: inserted, error } = await insertIdea(ideaDb);
         if (error) { showToast("Failed to save idea."); return; }
+        if (inserted) {
+          const newIdea = dbToIdea(inserted);
+          setIdeas((prev) => {
+            if (prev.some((x) => x.id === newIdea.id)) return prev;
+            return [...prev, newIdea];
+          });
+          showToast("Idea added!", "success");
+        }
       }
     }
     setIdeaModal(null);
@@ -416,7 +443,7 @@ export default function App() {
         page={page} setPage={setPage}
         user={user} guestMode={guestMode}
         currentProject={currentProject}
-        onSelectProject={() => setCurrentProject(null)}
+        onSelectProject={handleSwitchProject}
         onInvite={() => setCollaboratorsOpen(true)}
         onShowActivity={() => setActivityOpen(!activityOpen)}
         onNewTask={() => setTaskModal({ mode: "add", data: { status: stages[0]?.id ?? "planned" } })}

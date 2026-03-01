@@ -49,8 +49,9 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
     }, []);
 
     const openDropdown = async () => {
-        setDropdownOpen((o) => !o);
-        if (!dropdownOpen && !guestMode && user) {
+        const opening = !dropdownOpen;
+        setDropdownOpen(opening);
+        if (opening && !guestMode && user) {
             setLoadingProjects(true);
             const { data } = await fetchProjects();
             if (data) setProjects(data);
