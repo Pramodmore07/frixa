@@ -107,8 +107,8 @@ export default function LandingPage({ onGetStarted }) {
             <div style={{ position: "fixed", inset: 0, zIndex: 0, backgroundImage: "radial-gradient(#CBD5E1 1px, transparent 1px)", backgroundSize: "36px 36px", opacity: 0.45, pointerEvents: "none" }} />
 
             {/* ── GRADIENT ORBS ── */}
-            <div style={{ position: "fixed", top: -200, left: -200, width: 600, height: 600, background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
-            <div style={{ position: "fixed", top: 200, right: -200, width: 500, height: 500, background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+            <div style={{ position: "fixed", top: -200, left: -200, width: 600, height: 600, background: "radial-gradient(circle, rgba(71,85,105,0.1) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+            <div style={{ position: "fixed", top: 200, right: -200, width: 500, height: 500, background: "radial-gradient(circle, rgba(100,116,139,0.07) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
             {/* ═══════════════════════════════════ NAVBAR ═══════════════════════════════════ */}
             <nav style={{
@@ -140,14 +140,14 @@ export default function LandingPage({ onGetStarted }) {
             {/* ═══════════════════════════════════ HERO ═══════════════════════════════════ */}
             <header style={{ position: "relative", zIndex: 1, padding: "160px 20px 80px", textAlign: "center" }}>
                 <div style={{ animation: "heroFadeUp .8s cubic-bezier(.22,1,.36,1) both" }}>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 6px 5px 14px", background: "linear-gradient(135deg, #EFF6FF, #F5F3FF)", borderRadius: 100, marginBottom: 28, border: "1px solid #DBEAFE" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 6px 5px 14px", background: "#F4F5F7", borderRadius: 100, marginBottom: 28, border: "1px solid #E8EAED" }}>
                         <span style={{ fontSize: 12, fontWeight: 600, color: "#374151" }}>Cloud Workspaces is now live</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#2563EB", padding: "3px 10px", borderRadius: 100 }}>Beta →</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#475569", padding: "3px 10px", borderRadius: 100 }}>Beta →</span>
                     </div>
 
                     <h1 style={{ fontSize: "clamp(42px, 6.5vw, 82px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.03, marginBottom: 22, maxWidth: 900, margin: "0 auto 22px" }}>
                         The project workspace<br />
-                        <span style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your team will actually use.</span>
+                        <span style={{ background: "linear-gradient(135deg, #111218, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your team will actually use.</span>
                     </h1>
 
                     <p style={{ fontSize: "clamp(16px, 1.3vw, 20px)", color: "#6B7280", maxWidth: 580, margin: "0 auto 44px", lineHeight: 1.7, fontWeight: 400 }}>
@@ -201,7 +201,7 @@ export default function LandingPage({ onGetStarted }) {
                         <div style={{ padding: "20px", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, background: "#F4F5F7", minHeight: 260 }}>
                             {[
                                 { label: "Planned", color: "#6B7280", cards: ["Design system audit","API rate limiting","Mobile responsive nav"] },
-                                { label: "In Progress", color: "#2563EB", cards: ["Auth flow redesign","Real-time collab","Supabase migration"] },
+                                { label: "In Progress", color: "#475569", cards: ["Auth flow redesign","Real-time collab","Supabase migration"] },
                                 { label: "Review", color: "#D97706", cards: ["Landing page v2","Performance audit"] },
                                 { label: "Done", color: "#059669", cards: ["Project setup","Kanban board","User onboarding"] },
                             ].map((col) => (
@@ -244,7 +244,7 @@ export default function LandingPage({ onGetStarted }) {
                 <div style={{ maxWidth: 1200, margin: "0 auto" }}>
                     <Reveal>
                         <div style={{ textAlign: "center", marginBottom: 72 }}>
-                            <div style={{ display: "inline-block", padding: "4px 14px", background: "#F0F4FF", borderRadius: 100, fontSize: 12, fontWeight: 700, color: "#2563EB", marginBottom: 16, border: "1px solid #DBEAFE" }}>FEATURES</div>
+                            <div style={{ display: "inline-block", padding: "4px 14px", background: "#F4F5F7", borderRadius: 100, fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 16, border: "1px solid #E8EAED" }}>FEATURES</div>
                             <h2 style={{ fontSize: "clamp(32px,4vw,52px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: 16 }}>Everything your team needs.<br /><span style={{ color: "#9CA3AF", fontWeight: 600 }}>Nothing it doesn't.</span></h2>
                             <p style={{ fontSize: 17, color: "#6B7280", maxWidth: 520, margin: "0 auto" }}>Built by a team that was frustrated with bloated tools. Frixa does one thing: keeps your team aligned and moving fast.</p>
                         </div>
@@ -265,12 +265,12 @@ export default function LandingPage({ onGetStarted }) {
             </section>
 
             {/* ═══════════════════════════════════ HOW IT WORKS ═══════════════════════════════════ */}
-            <section id="how" style={{ position: "relative", zIndex: 1, padding: "100px 24px", background: "linear-gradient(180deg, transparent, rgba(239,246,255,0.5), transparent)" }}>
+            <section id="how" style={{ position: "relative", zIndex: 1, padding: "100px 24px", background: "linear-gradient(180deg, transparent, rgba(241,245,249,0.6), transparent)" }}>
                 <div style={{ maxWidth: 1100, margin: "0 auto" }}>
                     <Reveal>
                         <div style={{ textAlign: "center", marginBottom: 72 }}>
                             <div style={{ display: "inline-block", padding: "4px 14px", background: "#F0FDF4", borderRadius: 100, fontSize: 12, fontWeight: 700, color: "#059669", marginBottom: 16, border: "1px solid #D1FAE5" }}>HOW IT WORKS</div>
-                            <h2 style={{ fontSize: "clamp(32px,4vw,52px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: 16 }}>Up and running in<br /><span style={{ color: "#2563EB" }}>under 3 minutes.</span></h2>
+                            <h2 style={{ fontSize: "clamp(32px,4vw,52px)", fontWeight: 800, letterSpacing: "-2px", marginBottom: 16 }}>Up and running in<br /><span style={{ color: "#475569" }}>under 3 minutes.</span></h2>
                             <p style={{ fontSize: 17, color: "#6B7280" }}>No onboarding calls. No setup wizard. Just create, invite, and build.</p>
                         </div>
                     </Reveal>
@@ -280,7 +280,7 @@ export default function LandingPage({ onGetStarted }) {
                             <Reveal key={i} delay={i * 120}>
                                 <div style={{ position: "relative" }}>
                                     {i < steps.length - 1 && (
-                                        <div style={{ position: "absolute", top: 28, left: "calc(100% + 16px)", width: "calc(100% - 32px)", height: 2, background: "linear-gradient(90deg,#DBEAFE,transparent)", zIndex: 1, display: "none" }} className="step-arrow" />
+                                        <div style={{ position: "absolute", top: 28, left: "calc(100% + 16px)", width: "calc(100% - 32px)", height: 2, background: "linear-gradient(90deg,#E2E8F0,transparent)", zIndex: 1, display: "none" }} className="step-arrow" />
                                     )}
                                     <div style={{ padding: "36px 32px", background: "#fff", borderRadius: 24, border: "1.5px solid #F0F1F3", height: "100%", boxShadow: "0 4px 20px rgba(0,0,0,0.04)" }}>
                                         <div style={{ fontSize: "clamp(48px,5vw,72px)", fontWeight: 900, letterSpacing: "-3px", color: "#F0F1F3", lineHeight: 1, marginBottom: 20, fontFamily: "system-ui" }}>{s.n}</div>
@@ -313,13 +313,13 @@ export default function LandingPage({ onGetStarted }) {
                                 </div>
                             </div>
                             {/* Right top */}
-                            <div style={{ background: "#EFF6FF", borderRadius: 28, padding: "36px 32px", border: "1.5px solid #DBEAFE" }}>
+                            <div style={{ background: "#F8FAFC", borderRadius: 28, padding: "36px 32px", border: "1.5px solid #E2E8F0" }}>
                                 <div style={{ fontSize: 28, marginBottom: 16 }}>🔒</div>
                                 <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 10, color: "#111218" }}>Enterprise-grade security</h3>
                                 <p style={{ fontSize: 14, color: "#6B7280", lineHeight: 1.7 }}>Row Level Security enforced at the database. Your data never mixes with another team's. GDPR-friendly by design.</p>
                             </div>
                             {/* Right bottom */}
-                            <div style={{ background: "#F5F3FF", borderRadius: 28, padding: "36px 32px", border: "1.5px solid #EDE9FE" }}>
+                            <div style={{ background: "#F1F5F9", borderRadius: 28, padding: "36px 32px", border: "1.5px solid #E2E8F0" }}>
                                 <div style={{ fontSize: 28, marginBottom: 16 }}>📱</div>
                                 <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 10, color: "#111218" }}>Works everywhere</h3>
                                 <p style={{ fontSize: 14, color: "#6B7280", lineHeight: 1.7 }}>Fully responsive on all devices. Open Frixa on your phone during standup and it just works. Native mobile app coming soon.</p>
@@ -349,7 +349,7 @@ export default function LandingPage({ onGetStarted }) {
                                     </div>
                                     <p style={{ fontSize: 14.5, color: "#374151", lineHeight: 1.7, marginBottom: 20, fontStyle: "italic" }}>"{t.text}"</p>
                                     <div style={{ display: "flex", alignItems: "center", gap: 10, borderTop: "1px solid #F0F1F3", paddingTop: 16 }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#2563EB,#7C3AED)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{t.avatar}</div>
+                                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#374151,#64748B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{t.avatar}</div>
                                         <div>
                                             <div style={{ fontSize: 13.5, fontWeight: 700, color: "#111218" }}>{t.name}</div>
                                             <div style={{ fontSize: 12, color: "#9CA3AF" }}>{t.role}</div>
@@ -363,7 +363,7 @@ export default function LandingPage({ onGetStarted }) {
             </section>
 
             {/* ═══════════════════════════════════ PRICING ═══════════════════════════════════ */}
-            <section id="pricing" style={{ position: "relative", zIndex: 1, padding: "100px 24px", background: "linear-gradient(180deg,transparent,rgba(239,246,255,0.4),transparent)" }}>
+            <section id="pricing" style={{ position: "relative", zIndex: 1, padding: "100px 24px", background: "linear-gradient(180deg,transparent,rgba(241,245,249,0.5),transparent)" }}>
                 <div style={{ maxWidth: 1000, margin: "0 auto" }}>
                     <Reveal>
                         <div style={{ textAlign: "center", marginBottom: 64 }}>
@@ -396,7 +396,7 @@ export default function LandingPage({ onGetStarted }) {
                         {/* Pro */}
                         <Reveal delay={120}>
                             <div style={{ padding: "36px 32px", background: "#111218", borderRadius: 24, border: "1.5px solid #1F2937", height: "100%", position: "relative", overflow: "hidden" }}>
-                                <div style={{ position: "absolute", top: 20, right: 20, padding: "4px 12px", background: "linear-gradient(135deg,#2563EB,#7C3AED)", borderRadius: 100, fontSize: 11, fontWeight: 700, color: "#fff" }}>MOST POPULAR</div>
+                                <div style={{ position: "absolute", top: 20, right: 20, padding: "4px 12px", background: "#475569", borderRadius: 100, fontSize: 11, fontWeight: 700, color: "#fff" }}>MOST POPULAR</div>
                                 <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: 16, textTransform: "uppercase", letterSpacing: ".06em" }}>Pro</div>
                                 <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 8 }}>
                                     <span style={{ fontSize: 52, fontWeight: 800, letterSpacing: "-3px", color: "#fff" }}>₹499</span>
@@ -448,7 +448,7 @@ export default function LandingPage({ onGetStarted }) {
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                         {faqs.map((f, i) => (
                             <Reveal key={i} delay={i * 50}>
-                                <div style={{ background: "#fff", borderRadius: 16, border: `1.5px solid ${openFaq === i ? "#DBEAFE" : "#F0F1F3"}`, overflow: "hidden", transition: "border-color .2s" }}>
+                                <div style={{ background: "#fff", borderRadius: 16, border: `1.5px solid ${openFaq === i ? "#E2E8F0" : "#F0F1F3"}`, overflow: "hidden", transition: "border-color .2s" }}>
                                     <button
                                         onClick={() => setOpenFaq(openFaq === i ? null : i)}
                                         style={{ width: "100%", padding: "20px 24px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, textAlign: "left" }}
@@ -473,8 +473,8 @@ export default function LandingPage({ onGetStarted }) {
                 <Reveal>
                     <div style={{ maxWidth: 860, margin: "0 auto", background: "#111218", borderRadius: 32, padding: "72px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
                         {/* Glow effects */}
-                        <div style={{ position: "absolute", top: -60, left: "20%", width: 300, height: 300, background: "radial-gradient(circle,rgba(37,99,235,0.3),transparent 70%)", pointerEvents: "none" }} />
-                        <div style={{ position: "absolute", bottom: -60, right: "20%", width: 250, height: 250, background: "radial-gradient(circle,rgba(124,58,237,0.25),transparent 70%)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", top: -60, left: "20%", width: 300, height: 300, background: "radial-gradient(circle,rgba(71,85,105,0.35),transparent 70%)", pointerEvents: "none" }} />
+                        <div style={{ position: "absolute", bottom: -60, right: "20%", width: 250, height: 250, background: "radial-gradient(circle,rgba(100,116,139,0.25),transparent 70%)", pointerEvents: "none" }} />
                         <div style={{ position: "relative" }}>
                             <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 20 }}>START TODAY</div>
                             <h2 style={{ fontSize: "clamp(32px,5vw,60px)", fontWeight: 800, letterSpacing: "-2.5px", color: "#fff", marginBottom: 20, lineHeight: 1.05 }}>
@@ -546,8 +546,8 @@ export default function LandingPage({ onGetStarted }) {
                 .nav-link-hover:hover { background: #F4F5F7 !important; color: #111218 !important; }
                 .btn-hover-ink:hover { opacity: 0.85 !important; }
                 .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 28px 56px rgba(0,0,0,0.18) !important; }
-                .cta-secondary:hover { border-color: #2563EB !important; color: #2563EB !important; }
-                .feat-card:hover { border-color: #DBEAFE !important; transform: translateY(-6px); box-shadow: 0 24px 48px rgba(37,130,246,0.08) !important; }
+                .cta-secondary:hover { border-color: #475569 !important; color: #475569 !important; }
+                .feat-card:hover { border-color: #E2E8F0 !important; transform: translateY(-6px); box-shadow: 0 24px 48px rgba(71,85,105,0.08) !important; }
                 .testi-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08) !important; }
                 .outline-btn-hover:hover { background: #111218 !important; color: #fff !important; border-color: #111218 !important; }
                 .ghost-btn-hover:hover { background: rgba(255,255,255,0.18) !important; }
