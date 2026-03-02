@@ -32,7 +32,10 @@ export default function StagesModal({ stages, tasks, onSave, onDelete, onClose }
     const requestDelete = (s) => {
         const count = activeTasks.filter((t) => t.status === s.id).length;
         if (count > 0) setDeleteConfirm({ ...s, count });
-        else setList((prev) => prev.filter((x) => x.id !== s.id));
+        else {
+            setList((prev) => prev.filter((x) => x.id !== s.id));
+            onDelete(s.id);
+        }
     };
 
     const confirmDelete = () => {
