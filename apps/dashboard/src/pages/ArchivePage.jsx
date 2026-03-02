@@ -2,21 +2,46 @@ import { useState } from "react";
 import { MONTHS } from "../constants";
 
 function DeleteConfirmModal({ task, onConfirm, onCancel }) {
+    const [typed, setTyped] = useState("");
+    const ready = typed === "DELETE";
+
     return (
         <div style={{ position: "fixed", inset: 0, zIndex: 700, background: "rgba(10,12,18,.55)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
             <div style={{ background: "#fff", borderRadius: 20, padding: "32px 28px", maxWidth: 400, width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,.22)", textAlign: "center" }}>
                 <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#FEE2E2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 16px" }}>🗑</div>
                 <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 17, fontWeight: 700, marginBottom: 8, color: "#111218" }}>Permanently delete task?</h3>
-                <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.65, marginBottom: 24 }}>
+                <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.65, marginBottom: 20 }}>
                     <strong style={{ color: "#111218" }}>"{task.title}"</strong> will be deleted forever. This cannot be undone.
                 </p>
+
+                <div style={{ textAlign: "left", marginBottom: 20 }}>
+                    <label style={{ fontSize: 11.5, fontWeight: 600, color: "#6B7280", display: "block", marginBottom: 7, letterSpacing: ".02em" }}>
+                        Type <strong style={{ fontFamily: "monospace", color: "#EF4444", background: "#FEF2F2", padding: "1px 5px", borderRadius: 4 }}>DELETE</strong> to confirm
+                    </label>
+                    <input
+                        autoFocus
+                        value={typed}
+                        onChange={(e) => setTyped(e.target.value)}
+                        style={{
+                            width: "100%", padding: "11px 14px", borderRadius: 10, boxSizing: "border-box",
+                            border: `2px solid ${ready ? "#EF4444" : "#E8EAED"}`,
+                            fontFamily: "'Poppins',sans-serif", fontSize: 14, fontWeight: 700,
+                            color: ready ? "#EF4444" : "#111218",
+                            outline: "none", textAlign: "center", letterSpacing: 2,
+                            background: ready ? "#FEF2F2" : "#fff",
+                            transition: "border-color .15s, background .15s",
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter" && ready) onConfirm(); if (e.key === "Escape") onCancel(); }}
+                    />
+                </div>
+
                 <div style={{ display: "flex", gap: 10 }}>
                     <button onClick={onCancel}
                         style={{ flex: 1, padding: "11px", border: "1.5px solid #E8EAED", borderRadius: 10, background: "transparent", fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 600, color: "#6B7280", cursor: "pointer" }}>
                         Cancel
                     </button>
-                    <button onClick={onConfirm}
-                        style={{ flex: 1, padding: "11px", border: "none", borderRadius: 10, fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 700, cursor: "pointer", background: "#EF4444", color: "#fff", transition: "all .15s", boxShadow: "0 4px 14px rgba(239,68,68,.3)" }}>
+                    <button onClick={onConfirm} disabled={!ready}
+                        style={{ flex: 1, padding: "11px", border: "none", borderRadius: 10, fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 700, cursor: ready ? "pointer" : "not-allowed", background: ready ? "#EF4444" : "#F3F4F6", color: ready ? "#fff" : "#C4C9D4", transition: "all .15s", boxShadow: ready ? "0 4px 14px rgba(239,68,68,.3)" : "none" }}>
                         🗑 Delete Forever
                     </button>
                 </div>

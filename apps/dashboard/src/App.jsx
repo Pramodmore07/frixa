@@ -487,7 +487,7 @@ export default function App() {
         onSignOut={guestMode ? exitGuestMode : () => supabase.auth.signOut()}
       />
 
-      <div style={{ animation: "fadeUp .35s cubic-bezier(.22,1,.36,1) both" }} key={page}>
+      <div style={{ animation: "fadeUp .35s cubic-bezier(.22,1,.36,1) both", minHeight: "calc(100vh - 60px)" }} key={page}>
         {page === "roadmap" && (
           <RoadmapPage
             tasks={tasks} stages={stages}
