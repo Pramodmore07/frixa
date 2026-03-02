@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 /* ── Animated counter ── */
 function Counter({ target, suffix = "" }) {
@@ -506,28 +507,39 @@ export default function LandingPage({ onGetStarted }) {
                             <p style={{ fontSize: 13.5, color: "#9CA3AF", lineHeight: 1.7, maxWidth: 280 }}>
                                 The minimal collaboration workspace for modern teams. Roadmaps, ideas, and real-time sync — all in one place.
                             </p>
-                            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-                                {["𝕏", "in", "gh"].map(s => (
-                                    <div key={s} style={{ width: 34, height: 34, borderRadius: 8, border: "1px solid #E8EAED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#6B7280", cursor: "pointer", fontWeight: 700 }}>{s}</div>
-                                ))}
-                            </div>
                         </div>
                         <div>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#111218", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 16 }}>Product</div>
-                            {["Features", "How it works", "Pricing", "Changelog", "Roadmap"].map(l => (
-                                <div key={l} style={{ fontSize: 13.5, color: "#6B7280", marginBottom: 10, cursor: "pointer" }} className="footer-link">{l}</div>
-                            ))}
+                            {[
+                                { label: "Features", href: "#features", anchor: true },
+                                { label: "How it works", href: "#how", anchor: true },
+                                { label: "Pricing", href: "#pricing", anchor: true },
+                                { label: "Changelog", href: "/changelog" },
+                                { label: "Roadmap", href: "/roadmap" },
+                            ].map(l => l.anchor
+                                ? <a key={l.label} href={l.href} style={{ display: "block", fontSize: 13.5, color: "#6B7280", marginBottom: 10, textDecoration: "none" }} className="footer-link">{l.label}</a>
+                                : <Link key={l.label} to={l.href} style={{ display: "block", fontSize: 13.5, color: "#6B7280", marginBottom: 10, textDecoration: "none" }} className="footer-link">{l.label}</Link>
+                            )}
                         </div>
                         <div>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#111218", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 16 }}>Company</div>
-                            {["About", "Blog", "Careers", "Press", "Contact"].map(l => (
-                                <div key={l} style={{ fontSize: 13.5, color: "#6B7280", marginBottom: 10, cursor: "pointer" }} className="footer-link">{l}</div>
+                            {[
+                                { label: "About", href: "/about" },
+                                { label: "Blog", href: "/blog" },
+                                { label: "Contact", href: "/contact" },
+                            ].map(l => (
+                                <Link key={l.label} to={l.href} style={{ display: "block", fontSize: 13.5, color: "#6B7280", marginBottom: 10, textDecoration: "none" }} className="footer-link">{l.label}</Link>
                             ))}
                         </div>
                         <div>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#111218", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 16 }}>Legal</div>
-                            {["Privacy Policy", "Terms of Service", "Cookie Policy", "Security"].map(l => (
-                                <div key={l} style={{ fontSize: 13.5, color: "#6B7280", marginBottom: 10, cursor: "pointer" }} className="footer-link">{l}</div>
+                            {[
+                                { label: "Privacy Policy", href: "/privacy" },
+                                { label: "Terms of Service", href: "/terms" },
+                                { label: "Cookie Policy", href: "/cookies" },
+                                { label: "Security", href: "/security" },
+                            ].map(l => (
+                                <Link key={l.label} to={l.href} style={{ display: "block", fontSize: 13.5, color: "#6B7280", marginBottom: 10, textDecoration: "none" }} className="footer-link">{l.label}</Link>
                             ))}
                         </div>
                     </div>
