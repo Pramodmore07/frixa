@@ -7,12 +7,6 @@ const values = [
   { icon: "🔒", title: "Privacy matters", desc: "Your data is yours. We never sell or share it." },
 ];
 
-const team = [
-  { name: "Arjun Mehta", role: "Co-founder & CEO", initials: "AM" },
-  { name: "Priya Sharma", role: "Co-founder & CTO", initials: "PS" },
-  { name: "Rahul Nair", role: "Head of Design", initials: "RN" },
-  { name: "Sneha Patel", role: "Engineering Lead", initials: "SP" },
-];
 
 export default function AboutPage() {
   return (
@@ -53,25 +47,11 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Team */}
-        <div>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111218", letterSpacing: "-0.8px", marginBottom: 32 }}>The team</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }} className="team-grid">
-            {team.map(m => (
-              <div key={m.name} style={{ textAlign: "center" }}>
-                <div style={{ width: 64, height: 64, borderRadius: 16, background: "#111218", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, margin: "0 auto 12px" }}>{m.initials}</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#111218" }}>{m.name}</div>
-                <div style={{ fontSize: 12.5, color: "#9CA3AF", marginTop: 2 }}>{m.role}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <style>{`
         @media (max-width: 600px) {
           .values-grid { grid-template-columns: 1fr !important; }
-          .team-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
     </PageLayout>
