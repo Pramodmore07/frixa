@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { dlDiff } from "../../utils/deadline";
 import { PRI_COLORS } from "../../constants";
+import StageDropdown from "./StageDropdown";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -15,7 +16,7 @@ function getMonthLabel(key) {
     return `${MONTHS[parseInt(mo)]} ${yr}`;
 }
 
-function TimelineItem({ task, onEdit, stages, deadlineColor }) {
+function TimelineItem({ task, onEdit, stages, deadlineColor, onPatchTask }) {
     const [dragging, setDragging] = useState(false);
     const getStageLabel = (id) => stages.find((s) => s.id === id)?.label ?? id;
     const getStageDot = (id) => stages.find((s) => s.id === id)?.dot ?? "#9CA3AF";
@@ -61,10 +62,15 @@ function TimelineItem({ task, onEdit, stages, deadlineColor }) {
             </div>
 
             {/* stage */}
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "3px 9px", background: "#F3F4F6", borderRadius: 6, fontWeight: 600, color: "#374151", whiteSpace: "nowrap" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: getStageDot(task.status), display: "inline-block" }} />
-                {getStageLabel(task.status)}
-            </span>
+            {onPatchTask
+                ? <StageDropdown task={task} stages={stages} onPatchTask={onPatchTask} />
+                : (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, padding: "3px 9px", background: "#F3F4F6", borderRadius: 6, fontWeight: 600, color: "#374151", whiteSpace: "nowrap" }}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: getStageDot(task.status), display: "inline-block" }} />
+                        {getStageLabel(task.status)}
+                    </span>
+                )
+            }
 
             {/* priority */}
             {p && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4, textTransform: "uppercase", letterSpacing: ".06em", background: p.bg, color: p.fg, whiteSpace: "nowrap" }}>{task.priority}</span>}
@@ -79,7 +85,7 @@ function TimelineItem({ task, onEdit, stages, deadlineColor }) {
     );
 }
 
-export default function TimelineView({ tasks, stages, onEdit, onPatchTask }) {
+export default function TimelineView({ tasks, stages, onEdit, onPatchTask, onMoveTask }) {
     const [dropState, setDropState] = useState(null); // month key
     const active = tasks.filter((t) => !t.archived);
 
@@ -167,7 +173,7 @@ export default function TimelineView({ tasks, stages, onEdit, onPatchTask }) {
                         {/* tasks in this month */}
                         <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 14, borderLeft: `2px solid ${isCurrent ? "#475569" : "#E8EAED"}` }}>
                             {monthTasks.map((task) => (
-                                <TimelineItem key={task.id} task={task} onEdit={onEdit} stages={stages} deadlineColor={deadlineColor} />
+                                <TimelineItem key={task.id} task={task} onEdit={onEdit} stages={stages} deadlineColor={deadlineColor} onPatchTask={onPatchTask} />
                             ))}
                         </div>
                     </div>
@@ -192,7 +198,7 @@ export default function TimelineView({ tasks, stages, onEdit, onPatchTask }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 14, borderLeft: "2px solid #E8EAED" }}>
                     {noDate.map((task) => (
-                        <TimelineItem key={task.id} task={task} onEdit={onEdit} stages={stages} deadlineColor={deadlineColor} />
+                        <TimelineItem key={task.id} task={task} onEdit={onEdit} stages={stages} deadlineColor={deadlineColor} onPatchTask={onPatchTask} />
                     ))}
                     {noDate.length === 0 && (
                         <div style={{ padding: "12px", textAlign: "center", color: "#C4C9D4", fontSize: 12, fontStyle: "italic" }}>Drag tasks here to remove deadline.</div>

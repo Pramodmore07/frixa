@@ -130,7 +130,7 @@ export default function RoadmapPage({
             )}
 
             {view === "list" && <ListView tasks={tasks} stages={stages} onEdit={onEditTask} onMove={onMoveTask} />}
-            {view === "table" && <TableView tasks={tasks} stages={stages} onEdit={onEditTask} />}
+            {view === "table" && <TableView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} onMoveTask={onMoveTask} />}
             {view === "priority" && <PriorityView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} />}
             {view === "timeline" && <TimelineView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} />}
         </div>
