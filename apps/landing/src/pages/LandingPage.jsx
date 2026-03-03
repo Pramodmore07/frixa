@@ -170,7 +170,7 @@ export default function LandingPage({ onGetStarted }) {
             )}
 
             {/* ═══════════════════════════════════ HERO ═══════════════════════════════════ */}
-            <header style={{ position: "relative", zIndex: 1, padding: "160px 20px 80px", textAlign: "center" }}>
+            <header className="hero-header" style={{ position: "relative", zIndex: 1, padding: "160px 20px 80px", textAlign: "center" }}>
                 <div style={{ animation: "heroFadeUp .8s cubic-bezier(.22,1,.36,1) both" }}>
                     {/* Announcement badge */}
                     <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 6px 5px 14px", background: "#F4F5F7", borderRadius: 100, marginBottom: 32, border: "1px solid #E8EAED", cursor: "pointer" }} className="badge-hover" onClick={onGetStarted}>
@@ -203,7 +203,7 @@ export default function LandingPage({ onGetStarted }) {
                 </div>
 
                 {/* Hero dashboard mockup */}
-                <div style={{ maxWidth: 980, margin: "72px auto 0", animation: "heroFadeUp .9s .15s cubic-bezier(.22,1,.36,1) both" }}>
+                <div className="hero-mockup" style={{ maxWidth: 980, margin: "72px auto 0", animation: "heroFadeUp .9s .15s cubic-bezier(.22,1,.36,1) both" }}>
                     <div style={{ background: "#fff", borderRadius: 24, border: "1px solid #E2E8F0", boxShadow: "0 48px 120px rgba(0,0,0,0.11), 0 0 0 1px rgba(0,0,0,0.025)", overflow: "hidden" }}>
                         {/* Window chrome */}
                         <div style={{ background: "#F4F5F7", borderBottom: "1px solid #E8EAED", padding: "12px 20px", display: "flex", alignItems: "center", gap: 12 }}>
@@ -522,7 +522,7 @@ export default function LandingPage({ onGetStarted }) {
             {/* ═══════════════════════════════════ FINAL CTA ═══════════════════════════════════ */}
             <section style={{ position: "relative", zIndex: 1, padding: "60px 24px 120px" }}>
                 <Reveal>
-                    <div style={{ maxWidth: 860, margin: "0 auto", background: "#111218", borderRadius: 32, padding: "80px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                    <div className="cta-inner" style={{ maxWidth: 860, margin: "0 auto", background: "#111218", borderRadius: 32, padding: "80px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
                         <div style={{ position: "absolute", top: -80, left: "15%", width: 360, height: 360, background: "radial-gradient(circle,rgba(99,102,241,0.18),transparent 70%)", pointerEvents: "none" }} />
                         <div style={{ position: "absolute", bottom: -60, right: "15%", width: 280, height: 280, background: "radial-gradient(circle,rgba(16,185,129,0.12),transparent 70%)", pointerEvents: "none" }} />
                         <div style={{ position: "relative" }}>
@@ -623,9 +623,13 @@ export default function LandingPage({ onGetStarted }) {
                     .footer-grid { grid-template-columns: 1fr 1fr !important; }
                     .step-arrow { display: none !important; }
                     .stat-cell { border-right: none !important; border-bottom: 1px solid #F0F1F3; }
+                    .hero-header { padding: 108px 16px 56px !important; }
+                    .hero-mockup { display: none !important; }
+                    .cta-inner { padding: 48px 24px !important; border-radius: 24px !important; }
                 }
                 @media (max-width: 480px) {
                     .footer-grid { grid-template-columns: 1fr !important; }
+                    .hero-header { padding: 96px 16px 48px !important; }
                 }
             `}</style>
         </div>

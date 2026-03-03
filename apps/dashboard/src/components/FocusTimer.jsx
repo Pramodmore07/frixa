@@ -82,7 +82,7 @@ export default function FocusTimer({ onDone }) {
                 transition: "background .4s",
             }} />
 
-            <div style={{
+            <div className="ft-inner" style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -387,6 +387,9 @@ export default function FocusTimer({ onDone }) {
                 @keyframes ftPulse {
                     0%, 100% { opacity: 1; transform: scale(1); }
                     50%       { opacity: .5; transform: scale(1.3); }
+                }
+                @media (max-width: 768px) {
+                    .ft-inner { padding: 20px 20px 20px !important; }
                 }
             `}</style>
         </div>

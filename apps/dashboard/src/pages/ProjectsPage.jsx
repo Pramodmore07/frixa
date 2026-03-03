@@ -301,7 +301,7 @@ export default function ProjectsPage({ currentProject, user, onSwitch, onCreateP
     const paginated = projects.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     return (
-        <div style={{ padding: "28px 28px 64px" }}>
+        <div className="projects-wrap" style={{ padding: "28px 28px 64px" }}>
             {/* ── Header ── */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, gap: 20, flexWrap: "wrap" }}>
                 <div>

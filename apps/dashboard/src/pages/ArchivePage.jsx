@@ -60,7 +60,7 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete })
     };
 
     return (
-        <div style={{ padding: "28px 28px 64px" }}>
+        <div className="archive-wrap" style={{ padding: "28px 28px 64px" }}>
             {/* header */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
                 <div>
@@ -84,8 +84,8 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete })
                         const dl = t.date ? new Date(t.date) : null;
                         const dlS = dl ? `${MONTHS[dl.getMonth()]} ${dl.getDate()}, ${dl.getFullYear()}` : "No deadline";
                         return (
-                            <div key={t.id} className="row-hover"
-                                style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,.04)", transition: "box-shadow .15s" }}
+                            <div key={t.id} className="row-hover archive-row"
+                                style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,.04)", transition: "box-shadow .15s", flexWrap: "wrap" }}
                             >
                                 <div style={{ width: 22, height: 22, flexShrink: 0, background: "#475569", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700 }}>✓</div>
                                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -123,6 +123,17 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete })
                     onCancel={() => setDeleteTarget(null)}
                 />
             )}
+
+            <style>{`
+                @media (max-width: 768px) {
+                    .archive-wrap { padding: 20px 16px 64px !important; }
+                    .archive-row { gap: 10px !important; }
+                }
+                @media (max-width: 560px) {
+                    .archive-row .restore-hover,
+                    .archive-row button[title="Delete permanently"] { font-size: 11px !important; padding: 4px 8px !important; }
+                }
+            `}</style>
         </div>
     );
 }

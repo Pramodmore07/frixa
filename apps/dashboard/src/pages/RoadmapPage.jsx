@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { dlStatus } from "../utils/deadline";
 import KanbanCol from "../components/kanban/KanbanCol";
+import MobileKanbanView from "../components/kanban/MobileKanbanView";
 import ListView from "../components/kanban/ListView";
 import TableView from "../components/kanban/TableView";
 import PriorityView from "../components/kanban/PriorityView";
@@ -39,6 +40,14 @@ export default function RoadmapPage({
     onEditTask, onAddTask, onMoveTask, onPatchTask, onTimerDone, onDuplicateTask
 }) {
     const [view, setView] = useState("kanban");
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+    useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handler);
+        return () => window.removeEventListener("resize", handler);
+    }, []);
+
     const active = tasks.filter((t) => !t.archived);
     const doneId = stages.find((s) => s.id === "done")?.id;
     const done = active.filter((t) => t.status === doneId).length;
@@ -53,7 +62,7 @@ export default function RoadmapPage({
     ];
 
     return (
-        <div style={{ padding: "32px 32px 80px" }}>
+        <div className="roadmap-wrap" style={{ padding: "32px 32px 80px" }}>
 
             {/* ── Header row ── */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
@@ -81,8 +90,8 @@ export default function RoadmapPage({
             {showTimer && <FocusTimer onDone={onTimerDone} />}
 
             {/* ── View switcher ── */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                <div style={{ display: "flex", background: "#fff", border: "1.5px solid #EBEBED", borderRadius: 12, padding: 4, gap: 2 }}>
+            <div className="view-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 12 }}>
+                <div className="view-switcher" style={{ display: "flex", background: "#fff", border: "1.5px solid #EBEBED", borderRadius: 12, padding: 4, gap: 2, overflowX: "auto", flexShrink: 1, minWidth: 0 }}>
                     {VIEWS.map((v) => {
                         const isActive = view === v.id;
                         return (
@@ -103,36 +112,59 @@ export default function RoadmapPage({
                         );
                     })}
                 </div>
-                <span style={{ fontSize: 11.5, color: "#D1D5DB", fontWeight: 600, letterSpacing: ".03em" }}>
+                <span className="view-count" style={{ fontSize: 11.5, color: "#D1D5DB", fontWeight: 600, letterSpacing: ".03em", whiteSpace: "nowrap" }}>
                     {active.length} task{active.length !== 1 ? "s" : ""}
                 </span>
             </div>
 
             {/* ── Kanban ── */}
             {view === "kanban" && (
-                <div style={{ overflowX: "auto", paddingBottom: 16 }}>
-                    <div style={{ display: "flex", gap: 14, alignItems: "flex-start", width: "100%" }}>
-                        {stages.map((col, ci) => {
-                            const colTasks = active.filter((t) => t.status === col.id).sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
-                            const n = stages.length;
-                            const colWidth = n <= 4
-                                ? `calc((100% - ${(n - 1) * 14}px) / ${n})`
-                                : `calc((90% - (3 * 14px)) / 4)`;
-                            return (
-                                <div key={col.id} style={{ width: colWidth, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-                                    <KanbanCol col={col} tasks={colTasks} animDelay={ci * 0.07}
-                                        onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} onDuplicate={onDuplicateTask} />
-                                </div>
-                            );
-                        })}
+                isMobile ? (
+                    <MobileKanbanView
+                        stages={stages}
+                        tasks={active}
+                        onEdit={onEditTask}
+                        onAdd={onAddTask}
+                        onMove={onMoveTask}
+                        onDuplicate={onDuplicateTask}
+                    />
+                ) : (
+                    <div style={{ overflowX: "auto", paddingBottom: 16 }}>
+                        <div style={{ display: "flex", gap: 14, alignItems: "flex-start", width: "100%" }}>
+                            {stages.map((col, ci) => {
+                                const colTasks = active.filter((t) => t.status === col.id).sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+                                const n = stages.length;
+                                const colWidth = n <= 4
+                                    ? `calc((100% - ${(n - 1) * 14}px) / ${n})`
+                                    : `calc((90% - (3 * 14px)) / 4)`;
+                                return (
+                                    <div key={col.id} style={{ width: colWidth, flexShrink: 0, display: "flex", flexDirection: "column" }}>
+                                        <KanbanCol col={col} tasks={colTasks} animDelay={ci * 0.07}
+                                            onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} onDuplicate={onDuplicateTask} />
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )
             )}
 
             {view === "list" && <ListView tasks={tasks} stages={stages} onEdit={onEditTask} onMove={onMoveTask} />}
             {view === "table" && <TableView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} onMoveTask={onMoveTask} />}
             {view === "priority" && <PriorityView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} />}
             {view === "timeline" && <TimelineView tasks={tasks} stages={stages} onEdit={onEditTask} onPatchTask={onPatchTask} />}
+
+            <style>{`
+                @media (max-width: 768px) {
+                    .roadmap-wrap { padding: 20px 16px 64px !important; }
+                    .view-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; }
+                    .view-switcher { width: 100% !important; flex-shrink: 0 !important; }
+                    .view-switcher { scrollbar-width: none; }
+                    .view-switcher::-webkit-scrollbar { display: none; }
+                    .view-tab { padding: 6px 10px !important; font-size: 11.5px !important; }
+                    .view-count { display: none !important; }
+                }
+            `}</style>
         </div>
     );
 }

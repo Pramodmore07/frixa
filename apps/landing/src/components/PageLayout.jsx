@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const footerLinks = {
@@ -45,28 +46,64 @@ function FooterLink({ label, to }) {
   );
 }
 
+const innerNavLinks = [
+  { label: "Features", href: "/#features" },
+  { label: "How it works", href: "/#how" },
+  { label: "Pricing", href: "/#pricing" },
+];
+
 export default function PageLayout({ children }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" }}>
       {/* Nav */}
       <nav style={{ borderBottom: "1px solid #F0F1F3", padding: "0 24px", height: 60, display: "flex", alignItems: "center", position: "sticky", top: 0, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", zIndex: 100 }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", gap: 32 }}>
-          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}>
             <img src="/logo.png" alt="Frixa" style={{ height: 20, width: "auto" }} />
           </Link>
-          <div style={{ display: "flex", gap: 4, flex: 1 }}>
-            <a href="/#features" style={{ fontSize: 13.5, color: "#6B7280", padding: "6px 12px", borderRadius: 8, textDecoration: "none" }} className="nav-link-hover">Features</a>
-            <a href="/#how" style={{ fontSize: 13.5, color: "#6B7280", padding: "6px 12px", borderRadius: 8, textDecoration: "none" }} className="nav-link-hover">How it works</a>
-            <a href="/#pricing" style={{ fontSize: 13.5, color: "#6B7280", padding: "6px 12px", borderRadius: 8, textDecoration: "none" }} className="nav-link-hover">Pricing</a>
+          {/* Desktop nav links */}
+          <div style={{ display: "flex", gap: 4, flex: 1 }} className="lp-desktop-nav">
+            {innerNavLinks.map(l => (
+              <a key={l.label} href={l.href} style={{ fontSize: 13.5, color: "#6B7280", padding: "6px 12px", borderRadius: 8, textDecoration: "none" }} className="nav-link-hover">{l.label}</a>
+            ))}
           </div>
+          {/* Desktop CTA */}
           <a
             href={import.meta.env.VITE_APP_URL || "https://app.frixa.in"}
-            style={{ padding: "8px 20px", background: "#111218", color: "#fff", border: "none", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer", textDecoration: "none" }}
+            style={{ padding: "8px 20px", background: "#111218", color: "#fff", border: "none", borderRadius: 10, fontSize: 13.5, fontWeight: 600, cursor: "pointer", textDecoration: "none", flexShrink: 0 }}
+            className="lp-desktop-nav"
           >
             Get started →
           </a>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(v => !v)}
+            style={{ display: "none", background: "none", border: "none", cursor: "pointer", padding: 6, borderRadius: 8, color: "#374151", marginLeft: "auto" }}
+            className="lp-mobile-btn"
+            aria-label="Menu"
+          >
+            {mobileOpen
+              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+            }
+          </button>
         </div>
       </nav>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 99, background: "rgba(0,0,0,0.3)", backdropFilter: "blur(4px)" }} onClick={() => setMobileOpen(false)}>
+          <div style={{ position: "absolute", top: 0, right: 0, width: 260, height: "100%", background: "#fff", padding: "76px 20px 40px", display: "flex", flexDirection: "column", gap: 4, boxShadow: "-16px 0 40px rgba(0,0,0,0.1)" }} onClick={e => e.stopPropagation()}>
+            {innerNavLinks.map(l => (
+              <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} style={{ padding: "12px 16px", fontSize: 15, fontWeight: 600, color: "#374151", textDecoration: "none", borderRadius: 10, display: "block" }} className="lp-mobile-nav-link">{l.label}</a>
+            ))}
+            <div style={{ height: 1, background: "#F0F1F3", margin: "12px 0" }} />
+            <a href={import.meta.env.VITE_APP_URL || "https://app.frixa.in"} style={{ padding: "14px", background: "#111218", color: "#fff", borderRadius: 12, fontSize: 14, fontWeight: 700, textAlign: "center", textDecoration: "none", display: "block" }}>Get started →</a>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <main style={{ flex: 1 }}>
@@ -102,8 +139,14 @@ export default function PageLayout({ children }) {
       <style>{`
         .nav-link-hover:hover { background: #F4F5F7 !important; color: #111218 !important; }
         .footer-link:hover { color: #111218 !important; }
+        .lp-mobile-nav-link:hover { background: #F4F5F7 !important; }
         @media (max-width: 768px) {
           .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          .lp-desktop-nav { display: none !important; }
+          .lp-mobile-btn { display: flex !important; align-items: center; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+          .footer-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>

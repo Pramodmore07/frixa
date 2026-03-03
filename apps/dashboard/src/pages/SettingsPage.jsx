@@ -17,12 +17,12 @@ function Section({ title, desc, children }) {
 
 function Row({ label, desc, children }) {
     return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 0", borderBottom: "1px solid #F9FAFB" }}>
-            <div style={{ minWidth: 0 }}>
+        <div className="settings-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 0", borderBottom: "1px solid #F9FAFB" }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 13.5, fontWeight: 600, color: "#111218" }}>{label}</div>
                 {desc && <div style={{ fontSize: 12, color: "#9CA3AF", marginTop: 2 }}>{desc}</div>}
             </div>
-            <div style={{ flexShrink: 0 }}>{children}</div>
+            <div className="settings-row-ctrl" style={{ flexShrink: 0 }}>{children}</div>
         </div>
     );
 }
@@ -133,7 +133,7 @@ export default function SettingsPage({
     const [stagesOpen, setStagesOpen] = useState(false);
 
     return (
-        <div style={{ padding: "28px 28px 80px", maxWidth: 720, margin: "0 auto" }}>
+        <div className="settings-wrap" style={{ padding: "28px 28px 80px", maxWidth: 720, margin: "0 auto" }}>
 
             {/* ── Page header ── */}
             <div style={{ marginBottom: 32 }}>
@@ -285,6 +285,13 @@ export default function SettingsPage({
 
             <style>{`
                 .settings-manage-btn:hover { background: #fff !important; border-color: #475569 !important; }
+                @media (max-width: 640px) {
+                    .settings-wrap { padding: 20px 16px 64px !important; }
+                    .settings-row { flex-wrap: wrap !important; }
+                    .settings-row-ctrl { width: 100% !important; }
+                    .settings-row-ctrl input { width: 100% !important; box-sizing: border-box; }
+                    .settings-row-ctrl > div { width: 100% !important; box-sizing: border-box; }
+                }
             `}</style>
         </div>
     );

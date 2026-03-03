@@ -73,13 +73,13 @@ export default function LoginScreen({ onGuestMode }) {
         }}>
             <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 55% 45% at 18% 18%, rgba(71,85,105,.07) 0%, transparent 70%), radial-gradient(ellipse 45% 38% at 82% 82%, rgba(100,116,139,.05) 0%, transparent 70%)" }} />
 
-            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", width: 420, animation: "fadeUp .65s cubic-bezier(.22,1,.36,1) both" }}>
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", width: "min(420px, 94vw)", animation: "fadeUp .65s cubic-bezier(.22,1,.36,1) both" }}>
                 {/* Logo */}
                 <div style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <img src="/logo.png" alt="Frixa" style={{ height: 40, width: "auto", objectFit: "contain" }} />
                 </div>
 
-                <div style={{ width: "100%", background: "#fff", border: "1px solid #E8EAED", borderRadius: 24, padding: "40px 38px 32px", boxShadow: "0 28px 72px rgba(0,0,0,.13)", textAlign: "center" }}>
+                <div className="login-card" style={{ width: "100%", background: "#fff", border: "1px solid #E8EAED", borderRadius: 24, padding: "40px 38px 32px", boxShadow: "0 28px 72px rgba(0,0,0,.13)", textAlign: "center" }}>
                     <h1 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 800, letterSpacing: "-.5px", lineHeight: 1.2, marginBottom: 6, color: "#0F1117" }}>
                         {mode === "signin" ? "Welcome back" : "Create account"}
                     </h1>
@@ -163,7 +163,11 @@ export default function LoginScreen({ onGuestMode }) {
             </div>
             <style>{`
                 @keyframes spin { to { transform: rotate(360deg); } }
+                @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
                 .google-btn:hover:not(:disabled) { background: #F4F5F7 !important; border-color: #475569 !important; box-shadow: 0 3px 12px rgba(71,85,105,.1) !important; }
+                @media (max-width: 480px) {
+                    .login-card { padding: 28px 20px 24px !important; border-radius: 18px !important; }
+                }
             `}</style>
         </div>
     );

@@ -73,11 +73,11 @@ function TimelineItem({ task, onEdit, stages, deadlineColor, onPatchTask }) {
             }
 
             {/* priority */}
-            {p && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4, textTransform: "uppercase", letterSpacing: ".06em", background: p.bg, color: p.fg, whiteSpace: "nowrap" }}>{task.priority}</span>}
+            {p && <span className="tl-priority" style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4, textTransform: "uppercase", letterSpacing: ".06em", background: p.bg, color: p.fg, whiteSpace: "nowrap" }}>{task.priority}</span>}
 
             {/* deadline status chip */}
             {task.date && (
-                <span style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 10px", borderRadius: 6, background: dc.bg, color: dc.fg, whiteSpace: "nowrap" }}>
+                <span className="tl-dl-chip" style={{ fontSize: 10.5, fontWeight: 700, padding: "3px 10px", borderRadius: 6, background: dc.bg, color: dc.fg, whiteSpace: "nowrap" }}>
                     {dlDiff(task.date, null) === null ? "—" : dlDiff(task.date, null) < 0 ? "Overdue" : dlDiff(task.date, null) === 0 ? "Today" : dlDiff(task.date, null) === 1 ? "Tomorrow" : `in ${dlDiff(task.date, null)}d`}
                 </span>
             )}
@@ -132,6 +132,12 @@ export default function TimelineView({ tasks, stages, onEdit, onPatchTask, onMov
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            <style>{`
+                @media (max-width: 560px) {
+                    .tl-priority { display: none !important; }
+                    .tl-dl-chip { display: none !important; }
+                }
+            `}</style>
             {Object.keys(grouped).length === 0 && noDate.length === 0 && (
                 <div style={{ textAlign: "center", padding: "60px 20px", color: "#DADCE0", fontFamily: "'Poppins',sans-serif" }}>
                     <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>

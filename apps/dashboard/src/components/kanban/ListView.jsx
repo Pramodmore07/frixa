@@ -70,11 +70,11 @@ function ListRow({ task, i, isFirst, onEdit, onMove, colId }) {
 
             {/* desc truncated */}
             {task.desc && (
-                <span style={{ fontSize: 12, color: "#9CA3AF", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 220 }}>{task.desc}</span>
+                <span className="lv-desc" style={{ fontSize: 12, color: "#9CA3AF", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 220 }}>{task.desc}</span>
             )}
 
             {/* tags */}
-            <div style={{ display: "flex", gap: 4 }}>
+            <div className="lv-tags" style={{ display: "flex", gap: 4 }}>
                 {task.tags?.slice(0, 2).map((tag) => (
                     <span key={tag} style={{ fontSize: 10, padding: "2px 7px", background: "#F1F5F9", border: "1px solid rgba(71,85,105,.18)", color: "#475569", borderRadius: 4, fontWeight: 600, whiteSpace: "nowrap" }}>{tag}</span>
                 ))}
@@ -140,6 +140,12 @@ export default function ListView({ tasks, stages, onEdit, onMove }) {
                     <p style={{ fontSize: 14 }}>No tasks yet. Add your first task!</p>
                 </div>
             )}
+
+            <style>{`
+                @media (max-width: 640px) {
+                    .lv-desc, .lv-tags { display: none !important; }
+                }
+            `}</style>
         </div>
     );
 }

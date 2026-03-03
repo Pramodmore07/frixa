@@ -40,7 +40,7 @@ function Avatar({ email, size = 32 }) {
     );
 }
 
-export default function Topbar({ page, setPage, user, guestMode, currentProject, onSelectProject, onInvite, onShowActivity, onNewTask, onNewIdea, onSettings, onSignOut }) {
+export default function Topbar({ page, setPage, user, guestMode, currentProject, onSelectProject, onInvite, onShowActivity, onNewTask, onNewIdea, onNewNote, onSettings, onSignOut }) {
     const [clock, setClock] = useState({ time: "", date: "" });
     const [scrolled, setScrolled] = useState(false);
 
@@ -160,12 +160,13 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
     const actionBtn =
         page === "roadmap" ? <Btn onClick={onNewTask}>+ New Task</Btn> :
             page === "ideas" ? <Btn onClick={onNewIdea}>+ New Idea</Btn> :
-                null;
+                page === "notes" ? <Btn onClick={onNewNote}>+ New Note</Btn> :
+                    null;
 
     const email = user?.email || "";
 
     return (
-        <div style={{
+        <div className="topbar-root" style={{
             position: "sticky", top: 0, zIndex: 200, height: 60, padding: "0 28px",
             background: scrolled ? "rgba(255,255,255,.93)" : "rgba(244,245,247,.7)",
             backdropFilter: "blur(14px)",
@@ -180,10 +181,10 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                 {/* Logo */}
                 <img src="/logo.png" alt="Frixa" style={{ height: 22, width: "auto", objectFit: "contain", flexShrink: 0 }} />
 
-                <div style={{ width: 1, height: 24, background: "#E8EAED" }} />
+                <div className="tb-sep" style={{ width: 1, height: 24, background: "#E8EAED" }} />
 
                 {/* Project switcher pill + dropdown */}
-                <div ref={dropdownRef} style={{ position: "relative" }}>
+                <div ref={dropdownRef} className="tb-project" style={{ position: "relative" }}>
                     <button
                         onClick={openDropdown}
                         style={{
@@ -316,11 +317,11 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                     )}
                 </div>
 
-                <div style={{ width: 1, height: 24, background: "#E8EAED" }} />
+                <div className="tb-sep" style={{ width: 1, height: 24, background: "#E8EAED" }} />
 
                 {/* Page nav */}
-                <nav style={{ display: "flex", gap: 2 }}>
-                    {(guestMode ? ["roadmap", "ideas", "archive"] : ["roadmap", "ideas", "archive", "projects"]).map((id) => (
+                <nav className="tb-nav" style={{ display: "flex", gap: 2 }}>
+                    {(guestMode ? ["roadmap", "ideas", "notes", "archive"] : ["roadmap", "ideas", "notes", "archive", "projects"]).map((id) => (
                         <button
                             key={id}
                             onClick={() => setPage(id)}
@@ -342,7 +343,7 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
 
                 {/* Clock */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#F0F1F3", border: "1px solid #E8EAED", borderRadius: 12, padding: "5px 14px" }}>
+                <div className="tb-clock" style={{ display: "flex", alignItems: "center", gap: 10, background: "#F0F1F3", border: "1px solid #E8EAED", borderRadius: 12, padding: "5px 14px" }}>
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{ color: "#9CA3AF", flexShrink: 0 }}>
                         <rect x="1" y="2.5" width="13" height="11.5" rx="2.5" stroke="currentColor" strokeWidth="1.4" />
                         <path d="M1 6.5h13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
@@ -407,6 +408,9 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                                 )}
                                 {profileNav("Ideas", "ideas",
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5.5" r="3.5" stroke="currentColor" strokeWidth="1.3"/><path d="M5 10.5h4M5.5 12h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                                )}
+                                {profileNav("Notes", "notes",
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.3"/><path d="M4 5h6M4 7.5h6M4 10h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
                                 )}
                                 {profileNav("Archive", "archive",
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="2.5" rx="1" stroke="currentColor" strokeWidth="1.3"/><path d="M2.5 5.5v5.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V5.5" stroke="currentColor" strokeWidth="1.3"/><path d="M5.5 8h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
@@ -482,6 +486,16 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
                 @keyframes dropDown {
                     from { opacity: 0; transform: translateY(-8px); }
                     to   { opacity: 1; transform: translateY(0); }
+                }
+                @media (max-width: 768px) {
+                    .topbar-root { padding: 0 16px !important; }
+                    .tb-sep { display: none !important; }
+                    .tb-nav { display: none !important; }
+                    .tb-clock { display: none !important; }
+                    .tb-project .project-pill span:not(:last-child) { max-width: 80px !important; }
+                }
+                @media (max-width: 480px) {
+                    .tb-project { display: none !important; }
                 }
             `}</style>
         </div>

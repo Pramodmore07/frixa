@@ -62,7 +62,7 @@ export default function ProjectHome({ user, onSelectProject }) {
             minHeight: "100vh", background: "linear-gradient(145deg,#F4F5F7 0%,#FAFAFA 55%,#F1F5F9 100%)",
             display: "flex", alignItems: "center", justifyContent: "center", padding: 20
         }}>
-            <div style={{ width: 480, background: "#fff", border: "1px solid #E8EAED", borderRadius: 28, padding: 40, boxShadow: "0 28px 72px rgba(0,0,0,.13)" }}>
+            <div className="project-home-card" style={{ width: "min(480px, 100%)", background: "#fff", border: "1px solid #E8EAED", borderRadius: 28, padding: 40, boxShadow: "0 28px 72px rgba(0,0,0,.13)" }}>
                 <div style={{ textAlign: "center", marginBottom: 32 }}>
                     <img src="/logo.png" alt="Frixa" style={{ height: 40, width: "auto", objectFit: "contain", marginBottom: 16 }} />
                     <h1 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 24, fontWeight: 700, color: "#111218", marginBottom: 8 }}>Choose Workspace</h1>
@@ -198,6 +198,9 @@ export default function ProjectHome({ user, onSelectProject }) {
                 @keyframes fadeUp {
                     from { opacity: 0; transform: translateY(10px); }
                     to { opacity: 1; transform: translateY(0); }
+                }
+                @media (max-width: 480px) {
+                    .project-home-card { padding: 24px 18px !important; border-radius: 20px !important; }
                 }
             `}</style>
         </div>

@@ -25,18 +25,21 @@ import TimerPopup from "./components/TimerPopup";
 import Toast from "./components/layout/Toast";
 import RoadmapPage from "./pages/RoadmapPage";
 import IdeasPage from "./pages/IdeasPage";
+import NotesPage from "./pages/NotesPage";
 import ArchivePage from "./pages/ArchivePage";
 import ProjectsPage from "./pages/ProjectsPage";
 import SettingsPage from "./pages/SettingsPage";
+import NoteModal from "./components/modals/NoteModal";
 
 const GUEST_TASKS_KEY = "guest_tasks_v1";
 const GUEST_IDEAS_KEY = "guest_ideas_v1";
 const GUEST_STAGES_KEY = "guest_stages_v1";
 const GUEST_SETTINGS_KEY = "guest_settings_v1";
+const GUEST_NOTES_KEY = "guest_notes_v1";
 const SESSION_PROJECT_KEY = "session_project_id_v1";
 const SESSION_PAGE_KEY = "session_page_v1";
 
-const VALID_PAGES = ["roadmap", "ideas", "archive", "projects", "settings"];
+const VALID_PAGES = ["roadmap", "ideas", "notes", "archive", "projects", "settings"];
 
 const DEFAULT_SETTINGS = { showTimer: false };
 
@@ -59,6 +62,7 @@ export default function App() {
   });
   const [tasks, setTasks] = useState([]);
   const [ideas, setIdeas] = useState([]);
+  const [notes, setNotes] = useState(() => ls.get(GUEST_NOTES_KEY, []));
   const [stages, setStages] = useState(DEFAULT_STAGES);
   const [settings, setSettings] = useState(() => {
     try { return ls.get(GUEST_SETTINGS_KEY, DEFAULT_SETTINGS); }
@@ -67,6 +71,7 @@ export default function App() {
 
   const [taskModal, setTaskModal] = useState(null);
   const [ideaModal, setIdeaModal] = useState(null);
+  const [noteModal, setNoteModal] = useState(null);
   const [stagesModal, setStagesModal] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [collaboratorsOpen, setCollaboratorsOpen] = useState(false);
@@ -426,6 +431,27 @@ export default function App() {
     }
   }, [guestMode, currentProject, ideas, user]);
 
+  /* ── Notes CRUD (local only, persists via localStorage) ── */
+  const saveNote = useCallback((form) => {
+    setNotes((prev) => {
+      let next;
+      if (form.id) {
+        next = prev.map((n) => n.id === form.id ? { ...n, ...form } : n);
+      } else {
+        const newNote = { ...form, id: Date.now(), createdAt: new Date().toLocaleDateString() };
+        next = [newNote, ...prev];
+      }
+      ls.set(GUEST_NOTES_KEY, next);
+      return next;
+    });
+    setNoteModal(null);
+  }, []);
+
+  const deleteNote = useCallback((id) => {
+    setNotes((prev) => { const next = prev.filter((n) => n.id !== id); ls.set(GUEST_NOTES_KEY, next); return next; });
+    setNoteModal(null);
+  }, []);
+
   /* ── Settings ── */
   const saveSettings = useCallback((newSettings) => {
     setSettings(newSettings);
@@ -483,6 +509,7 @@ export default function App() {
         onShowActivity={() => setActivityOpen(!activityOpen)}
         onNewTask={() => setTaskModal({ mode: "add", data: { status: stages[0]?.id ?? "planned" } })}
         onNewIdea={() => setIdeaModal({ mode: "add", data: {} })}
+        onNewNote={() => setNoteModal({ mode: "add", data: {} })}
         onSettings={() => setPage("settings")}
         onSignOut={guestMode ? exitGuestMode : () => supabase.auth.signOut()}
       />
@@ -506,6 +533,13 @@ export default function App() {
             onVote={voteIdea}
             onEdit={(x) => setIdeaModal({ mode: "edit", data: x })}
             onAdd={() => setIdeaModal({ mode: "add", data: {} })}
+          />
+        )}
+        {page === "notes" && (
+          <NotesPage
+            notes={notes}
+            onEdit={(n) => setNoteModal({ mode: "edit", data: n })}
+            onAdd={() => setNoteModal({ mode: "add", data: {} })}
           />
         )}
         {page === "archive" && (
@@ -535,6 +569,7 @@ export default function App() {
 
       {taskModal && <TaskModal mode={taskModal.mode} initial={taskModal.data} stages={stages} onSave={saveTask} onArchive={archiveTask} onClose={() => setTaskModal(null)} />}
       {ideaModal && <IdeaModal mode={ideaModal.mode} initial={ideaModal.data} onSave={saveIdea} onDelete={handleDeleteIdea} onClose={() => setIdeaModal(null)} />}
+      {noteModal && <NoteModal mode={noteModal.mode} initial={noteModal.data} onSave={saveNote} onDelete={deleteNote} onClose={() => setNoteModal(null)} />}
       {stagesModal && <StagesModal stages={stages} tasks={tasks} onSave={saveStages} onDelete={removeStage} onClose={() => setStagesModal(false)} />}
       {settingsOpen && (
         <SettingsModal

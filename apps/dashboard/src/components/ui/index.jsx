@@ -96,7 +96,7 @@ export function FG({ label, children }) {
 
 export function Row2({ children }) {
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 0 }}>
+        <div className="ui-row2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 0 }}>
             {children}
         </div>
     );

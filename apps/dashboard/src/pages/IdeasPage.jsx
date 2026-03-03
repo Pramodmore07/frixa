@@ -92,7 +92,7 @@ export default function IdeasPage({ ideas, onVote, onEdit, onAdd }) {
     const paginated = sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     return (
-        <div style={{ padding: "28px 28px 64px" }}>
+        <div className="ideas-wrap" style={{ padding: "28px 28px 64px" }}>
             {/* ── Header ── */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
                 <div>

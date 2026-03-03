@@ -217,3 +217,21 @@ input[type=number] {
 .proj-item:hover {
     background: #F4F5F7 !important;
 }
+
+/* ── Mobile / Responsive ── */
+@media (max-width: 480px) {
+    .ui-row2 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Ensure touch targets are large enough */
+@media (max-width: 768px) {
+    button, a { -webkit-tap-highlight-color: transparent; }
+    input, select, textarea { font-size: 16px !important; } /* prevent zoom on iOS */
+}
+
+/* IdeasPage / ProjectsPage padding on mobile */
+@media (max-width: 768px) {
+    .ideas-wrap, .projects-wrap { padding: 20px 16px 64px !important; }
+}
