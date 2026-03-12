@@ -68,6 +68,31 @@ export function dbToStage(row) {
     return { id: row.id, label: row.label, dot: row.dot, sortOrder: row.sort_order, projectId: row.project_id };
 }
 
+export function dbToNote(row) {
+    return {
+        id: row.id,
+        title: row.title,
+        content: row.content ?? "",
+        color: row.color ?? "yellow",
+        pinned: row.pinned ?? false,
+        projectId: row.project_id,
+        userId: row.user_id,
+        createdAt: new Date(row.created_at).toLocaleDateString(),
+    };
+}
+
+export function noteToDb(note, userId, projectId) {
+    const out = {
+        title: note.title,
+        content: note.content ?? "",
+        color: note.color ?? "yellow",
+        pinned: note.pinned ?? false,
+    };
+    if (userId) out.user_id = userId;
+    if (projectId) out.project_id = projectId;
+    return out;
+}
+
 /* ══════════════════════════════════════════════════════
    PROJECTS & COLLABORATION
 ══════════════════════════════════════════════════════ */
@@ -263,4 +288,26 @@ export async function upsertStages(stages, userId, projectId) {
 
 export async function deleteStage(id) {
     return supabase.from("stages").delete().eq("id", id);
+}
+
+/* ══════════════════════════════════════════════════════
+   NOTES
+══════════════════════════════════════════════════════ */
+export async function fetchNotes(projectId) {
+    return supabase.from("notes")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false });
+}
+
+export async function insertNote(noteDb) {
+    return supabase.from("notes").insert(noteDb).select().single();
+}
+
+export async function updateNote(id, changes) {
+    return supabase.from("notes").update(changes).eq("id", id);
+}
+
+export async function deleteNoteById(id) {
+    return supabase.from("notes").delete().eq("id", id);
 }

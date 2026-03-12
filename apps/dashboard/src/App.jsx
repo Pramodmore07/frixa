@@ -1,12 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "./lib/supabase";
 import {
-  fetchTasks, fetchIdeas, fetchStages,
+  fetchTasks, fetchIdeas, fetchStages, fetchNotes,
   insertTask, updateTask, deleteTaskById,
   insertIdea, updateIdea, deleteIdea,
   upsertStages, deleteStage,
+  insertNote, updateNote, deleteNoteById,
   logActivity,
-  dbToTask, taskToDb, dbToIdea, ideaToDb, dbToStage,
+  dbToTask, taskToDb, dbToIdea, ideaToDb, dbToStage, dbToNote, noteToDb,
   joinProjectByInvite, fetchProjectById,
 } from "./lib/api";
 import { ls } from "./utils/localStorage";
@@ -62,7 +63,7 @@ export default function App() {
   });
   const [tasks, setTasks] = useState([]);
   const [ideas, setIdeas] = useState([]);
-  const [notes, setNotes] = useState(() => ls.get(GUEST_NOTES_KEY, []));
+  const [notes, setNotes] = useState([]);
   const [stages, setStages] = useState(DEFAULT_STAGES);
   const [settings, setSettings] = useState(() => {
     try { return ls.get(GUEST_SETTINGS_KEY, DEFAULT_SETTINGS); }
@@ -91,13 +92,14 @@ export default function App() {
     setIdeas(ls.get(GUEST_IDEAS_KEY, null) ?? seedIdeas());
     setStages(ls.get(GUEST_STAGES_KEY, null) ?? DEFAULT_STAGES);
     setSettings(ls.get(GUEST_SETTINGS_KEY, DEFAULT_SETTINGS));
+    setNotes(ls.get(GUEST_NOTES_KEY, []));
     setGuestMode(true);
     setLoading(false);
   }, []);
 
   const exitGuestMode = useCallback(() => {
     setGuestMode(false);
-    setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setCurrentProject(null);
+    setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setNotes([]); setCurrentProject(null);
     ls.set(SESSION_PROJECT_KEY, null);
     ls.set(SESSION_PAGE_KEY, "roadmap");
   }, []);
@@ -170,13 +172,14 @@ export default function App() {
     if (!projectId) return;
     setLoading(true);
     try {
-      const [tRes, iRes, sRes] = await Promise.all([
-        fetchTasks(projectId), fetchIdeas(projectId), fetchStages(projectId),
+      const [tRes, iRes, sRes, nRes] = await Promise.all([
+        fetchTasks(projectId), fetchIdeas(projectId), fetchStages(projectId), fetchNotes(projectId),
       ]);
 
-      // Always set tasks/ideas even if empty — don't block on errors
+      // Always set tasks/ideas/notes even if empty — don't block on errors
       setTasks(Array.isArray(tRes.data) ? tRes.data.map(dbToTask) : []);
       setIdeas(Array.isArray(iRes.data) ? iRes.data.map(dbToIdea) : []);
+      setNotes(Array.isArray(nRes.data) ? nRes.data.map(dbToNote) : []);
 
       if (sRes.data?.length > 0) {
         setStages(sRes.data.map(dbToStage));
@@ -207,7 +210,7 @@ export default function App() {
     const pid = currentProject.id;
 
     // Small debounce so rapid consecutive DB changes don't cause multiple fetches
-    let taskTimer, ideaTimer, stageTimer;
+    let taskTimer, ideaTimer, stageTimer, noteTimer;
 
     const channel = supabase
       .channel(`project-${pid}`)
@@ -235,10 +238,18 @@ export default function App() {
           }, 150);
         }
       )
+      .on("postgres_changes", { event: "*", schema: "public", table: "notes", filter: `project_id=eq.${pid}` },
+        () => {
+          clearTimeout(noteTimer);
+          noteTimer = setTimeout(() => {
+            fetchNotes(pid).then(({ data }) => { if (data) setNotes(data.map(dbToNote)); });
+          }, 150);
+        }
+      )
       .subscribe();
 
     return () => {
-      clearTimeout(taskTimer); clearTimeout(ideaTimer); clearTimeout(stageTimer);
+      clearTimeout(taskTimer); clearTimeout(ideaTimer); clearTimeout(stageTimer); clearTimeout(noteTimer);
       supabase.removeChannel(channel);
     };
   }, [user, currentProject?.id, guestMode]);
@@ -431,26 +442,55 @@ export default function App() {
     }
   }, [guestMode, currentProject, ideas, user]);
 
-  /* ── Notes CRUD (local only, persists via localStorage) ── */
-  const saveNote = useCallback((form) => {
-    setNotes((prev) => {
-      let next;
-      if (form.id) {
-        next = prev.map((n) => n.id === form.id ? { ...n, ...form } : n);
-      } else {
-        const newNote = { ...form, id: Date.now(), createdAt: new Date().toLocaleDateString() };
-        next = [newNote, ...prev];
+  /* ── Notes CRUD ── */
+  const saveNote = useCallback(async (form) => {
+    if (guestMode) {
+      setNotes((prev) => {
+        let next;
+        if (form.id) {
+          next = prev.map((n) => n.id === form.id ? { ...n, ...form } : n);
+        } else {
+          const newNote = { ...form, id: Date.now(), createdAt: new Date().toLocaleDateString() };
+          next = [newNote, ...prev];
+        }
+        ls.set(GUEST_NOTES_KEY, next);
+        return next;
+      });
+    } else if (form.id) {
+      // UPDATE
+      setNotes((prev) => prev.map((n) => n.id === form.id ? { ...n, ...form } : n));
+      if (currentProject) {
+        const { error } = await updateNote(form.id, noteToDb(form, user.id, currentProject.id));
+        if (error) showToast("Failed to update note.");
       }
-      ls.set(GUEST_NOTES_KEY, next);
+    } else {
+      // INSERT
+      if (currentProject) {
+        const noteDb = noteToDb(form, user.id, currentProject.id);
+        const { data: inserted, error } = await insertNote(noteDb);
+        if (error) { showToast("Failed to create note."); return; }
+        if (inserted) {
+          const newNote = dbToNote(inserted);
+          setNotes((prev) => {
+            if (prev.some((n) => n.id === newNote.id)) return prev;
+            return [newNote, ...prev];
+          });
+          showToast("Note saved!", "success");
+        }
+      }
+    }
+    setNoteModal(null);
+  }, [guestMode, currentProject, user, showToast]);
+
+  const deleteNote = useCallback(async (id) => {
+    setNotes((prev) => {
+      const next = prev.filter((n) => n.id !== id);
+      if (guestMode) ls.set(GUEST_NOTES_KEY, next);
       return next;
     });
     setNoteModal(null);
-  }, []);
-
-  const deleteNote = useCallback((id) => {
-    setNotes((prev) => { const next = prev.filter((n) => n.id !== id); ls.set(GUEST_NOTES_KEY, next); return next; });
-    setNoteModal(null);
-  }, []);
+    if (!guestMode && currentProject) await deleteNoteById(id);
+  }, [guestMode, currentProject]);
 
   /* ── Settings ── */
   const saveSettings = useCallback((newSettings) => {
