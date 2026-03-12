@@ -10,7 +10,7 @@ export const NOTE_COLORS = [
     { id: "gray",   bg: "#F9FAFB", border: "#D1D5DB", dot: "#6B7280", label: "Gray"   },
 ];
 
-export default function NoteModal({ mode, initial, onSave, onDelete, onClose }) {
+export default function NoteModal({ mode, initial, onSave, onArchive, onClose }) {
     const [form, setForm] = useState({ title: "", content: "", color: "yellow", pinned: false, ...initial });
     const field = (k) => ({ value: form[k], onChange: (e) => setForm((f) => ({ ...f, [k]: e.target.value })) });
 
@@ -53,7 +53,7 @@ export default function NoteModal({ mode, initial, onSave, onDelete, onClose }) 
             </FG>
 
             <ModalFoot>
-                {mode === "edit" && <DangerBtn onClick={() => onDelete(initial.id)}>🗑 Delete</DangerBtn>}
+                {mode === "edit" && <DangerBtn onClick={() => onArchive(initial.id)}>📦 Archive</DangerBtn>}
                 <GhostBtn onClick={onClose}>Cancel</GhostBtn>
                 <Btn onClick={save}>Save Note</Btn>
             </ModalFoot>

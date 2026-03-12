@@ -75,6 +75,7 @@ export function dbToNote(row) {
         content: row.content ?? "",
         color: row.color ?? "yellow",
         pinned: row.pinned ?? false,
+        archived: row.archived ?? false,
         projectId: row.project_id,
         userId: row.user_id,
         createdAt: new Date(row.created_at).toLocaleDateString(),

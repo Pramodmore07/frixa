@@ -443,6 +443,25 @@ export default function App() {
   }, [guestMode, currentProject, ideas, user]);
 
   /* ── Notes CRUD ── */
+  const archiveNote = useCallback(async (id) => {
+    setNotes((prev) => {
+      const next = prev.map((n) => n.id === id ? { ...n, archived: true } : n);
+      if (guestMode) ls.set(GUEST_NOTES_KEY, next);
+      return next;
+    });
+    setNoteModal(null);
+    if (!guestMode && currentProject) await updateNote(id, { archived: true });
+  }, [guestMode, currentProject]);
+
+  const restoreNote = useCallback(async (id) => {
+    setNotes((prev) => {
+      const next = prev.map((n) => n.id === id ? { ...n, archived: false } : n);
+      if (guestMode) ls.set(GUEST_NOTES_KEY, next);
+      return next;
+    });
+    if (!guestMode && currentProject) await updateNote(id, { archived: false });
+  }, [guestMode, currentProject]);
+
   const saveNote = useCallback(async (form) => {
     if (guestMode) {
       setNotes((prev) => {
@@ -488,7 +507,6 @@ export default function App() {
       if (guestMode) ls.set(GUEST_NOTES_KEY, next);
       return next;
     });
-    setNoteModal(null);
     if (!guestMode && currentProject) await deleteNoteById(id);
   }, [guestMode, currentProject]);
 
@@ -577,13 +595,18 @@ export default function App() {
         )}
         {page === "notes" && (
           <NotesPage
-            notes={notes}
+            notes={notes.filter((n) => !n.archived)}
             onEdit={(n) => setNoteModal({ mode: "edit", data: n })}
             onAdd={() => setNoteModal({ mode: "add", data: {} })}
           />
         )}
         {page === "archive" && (
-          <ArchivePage tasks={tasks} stages={stages} onRestore={restoreTask} onDelete={deleteTask} />
+          <ArchivePage
+            tasks={tasks} stages={stages} onRestore={restoreTask} onDelete={deleteTask}
+            notes={notes.filter((n) => n.archived)}
+            onRestoreNote={restoreNote}
+            onDeleteNote={deleteNote}
+          />
         )}
         {page === "projects" && !guestMode && (
           <ProjectsPage
@@ -609,7 +632,7 @@ export default function App() {
 
       {taskModal && <TaskModal mode={taskModal.mode} initial={taskModal.data} stages={stages} onSave={saveTask} onArchive={archiveTask} onClose={() => setTaskModal(null)} />}
       {ideaModal && <IdeaModal mode={ideaModal.mode} initial={ideaModal.data} onSave={saveIdea} onDelete={handleDeleteIdea} onClose={() => setIdeaModal(null)} />}
-      {noteModal && <NoteModal mode={noteModal.mode} initial={noteModal.data} onSave={saveNote} onDelete={deleteNote} onClose={() => setNoteModal(null)} />}
+      {noteModal && <NoteModal mode={noteModal.mode} initial={noteModal.data} onSave={saveNote} onArchive={archiveNote} onClose={() => setNoteModal(null)} />}
       {stagesModal && <StagesModal stages={stages} tasks={tasks} onSave={saveStages} onDelete={removeStage} onClose={() => setStagesModal(false)} />}
       {settingsOpen && (
         <SettingsModal
