@@ -339,14 +339,16 @@ export default function App() {
   }, [guestMode, currentProject, user, showToast, isDoneStage]);
 
   const moveTask = useCallback(async (dragged, targetCol, anchorId, position) => {
+    const draggedStr = String(dragged);
+    const anchorStr = anchorId != null ? String(anchorId) : null;
     let reordered;
     setTasks((prev) => {
-      const updated = prev.map((t) => t.id === dragged ? { ...t, status: targetCol } : t);
+      const updated = prev.map((t) => String(t.id) === draggedStr ? { ...t, status: targetCol } : t);
       const col = updated.filter((t) => !t.archived && t.status === targetCol).sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
-      const item = col.find((t) => t.id === dragged);
-      const others = col.filter((t) => t.id !== dragged);
+      const item = col.find((t) => String(t.id) === draggedStr);
+      const others = col.filter((t) => String(t.id) !== draggedStr);
       let idx = others.length;
-      if (anchorId != null) { const ai = others.findIndex((t) => t.id === anchorId); if (ai !== -1) idx = position === "before" ? ai : ai + 1; }
+      if (anchorStr != null) { const ai = others.findIndex((t) => String(t.id) === anchorStr); if (ai !== -1) idx = position === "before" ? ai : ai + 1; }
       others.splice(idx, 0, item);
       others.forEach((t, i) => { t.sortOrder = i; });
       reordered = others;
