@@ -107,13 +107,13 @@ export async function fetchProjects() {
         supabase.from("projects").select("*").order("created_at"),
 
         // Query 2: projects where I am a member via project_members
-        // Using a nested select so the RLS on project_members uses the simple
-        // "Users can read own membership" policy (auth.uid() = user_id)
-        supabase.from("project_members").select("project_id").then(async ({ data: rows }) => {
+        // Using an async IIFE so both queries are truly parallel at the top level
+        (async () => {
+            const { data: rows } = await supabase.from("project_members").select("project_id");
             if (!rows || rows.length === 0) return { data: [] };
             const ids = rows.map(r => r.project_id);
             return supabase.from("projects").select("*").in("id", ids).order("created_at");
-        }),
+        })(),
     ]);
 
     const owned = ownedRes.data || [];
@@ -171,11 +171,16 @@ export async function inviteMemberByEmail(projectId, email) {
         return { error: { message: "No account found with that email address." } };
     }
     // Insert into project_members
-    return supabase
+    const { data, error } = await supabase
         .from("project_members")
         .insert({ project_id: projectId, user_id: profile.id, role: "member" })
         .select()
         .single();
+    if (error) {
+        if (error.code === "23505") return { error: { message: "This user is already a member of the project." } };
+        return { error: { message: "Failed to add member. Please try again." } };
+    }
+    return { data, error: null };
 }
 
 export async function removeMember(projectId, userId) {
@@ -206,7 +211,7 @@ export async function fetchProjectById(projectId) {
 ══════════════════════════════════════════════════════ */
 export async function fetchActivity(projectId) {
     return supabase.from("activity_log")
-        .select("*, auth.users(email)")
+        .select("*, profiles(email)")
         .eq("project_id", projectId)
         .order("created_at", { ascending: false })
         .limit(20);

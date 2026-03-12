@@ -63,7 +63,7 @@ export default function PriorityView({ tasks, stages, onEdit, onPatchTask }) {
     const onDrop = (e, newPriority) => {
         e.preventDefault();
         setDropState(null);
-        const taskId = parseInt(e.dataTransfer.getData("taskId"));
+        const taskId = e.dataTransfer.getData("taskId");
         if (taskId) onPatchTask(taskId, { priority: newPriority });
     };
 

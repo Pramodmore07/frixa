@@ -27,8 +27,8 @@ function ListRow({ task, i, isFirst, onEdit, onMove, colId }) {
     const onDragLeave = (e) => { e.stopPropagation(); setDragState(null); };
     const onDrop = (e) => {
         e.preventDefault(); e.stopPropagation(); setDragState(null);
-        const id = parseInt(e.dataTransfer.getData("taskId"));
-        if (!id || id === task.id) return;
+        const id = e.dataTransfer.getData("taskId");
+        if (!id || id === String(task.id)) return;
         const r = ref.current?.getBoundingClientRect();
         onMove(id, colId, task.id, r && e.clientY < r.top + r.height / 2 ? "before" : "after");
     };
@@ -94,7 +94,7 @@ export default function ListView({ tasks, stages, onEdit, onMove }) {
 
     const onStageDrop = (e, stageId) => {
         e.preventDefault();
-        const taskId = parseInt(e.dataTransfer.getData("taskId"));
+        const taskId = e.dataTransfer.getData("taskId");
         if (taskId) onMove(taskId, stageId, null, "after");
     };
 

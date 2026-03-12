@@ -18,8 +18,13 @@ export function IOSDatePicker({ value, onChange }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [open]);
 
-    const date = value ? new Date(value) : new Date();
+    const date = value ? new Date(value + "T00:00:00") : new Date();
     const [viewDate, setViewDate] = useState(date);
+
+    // Sync calendar view when value changes externally (e.g. editing a different task)
+    useEffect(() => {
+        if (value) setViewDate(new Date(value + "T00:00:00"));
+    }, [value]);
 
     const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
@@ -90,7 +95,15 @@ export function IOSDatePicker({ value, onChange }) {
                 }}
             >
                 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{displayValue}</span>
-                <span style={{ fontSize: 15, flexShrink: 0 }}>🗓️</span>
+                {value ? (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onChange({ target: { value: "" } }); }}
+                        title="Clear date"
+                        style={{ border: "none", background: "none", cursor: "pointer", color: "#9CA3AF", fontSize: 16, lineHeight: 1, padding: "0 2px", flexShrink: 0, display: "flex", alignItems: "center" }}
+                    >×</button>
+                ) : (
+                    <span style={{ fontSize: 15, flexShrink: 0 }}>🗓️</span>
+                )}
             </div>
 
             {open && (

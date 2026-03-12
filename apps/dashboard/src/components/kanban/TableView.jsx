@@ -32,8 +32,8 @@ function TableRow({ task, i, stages, onEdit, onMove, onPatchTask }) {
     const onDragLeave = (e) => { e.stopPropagation(); setDragState(null); };
     const onDrop = (e) => {
         e.preventDefault(); e.stopPropagation(); setDragState(null);
-        const id = parseInt(e.dataTransfer.getData("taskId"));
-        if (!id || id === task.id) return;
+        const id = e.dataTransfer.getData("taskId");
+        if (!id || id === String(task.id)) return;
         const r = ref.current?.getBoundingClientRect();
         onMove(id, task.status, task.id, r && e.clientY < r.top + r.height / 2 ? "before" : "after");
     };

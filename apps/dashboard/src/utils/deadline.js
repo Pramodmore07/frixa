@@ -4,8 +4,10 @@ export const p2 = (n) => String(n).padStart(2, "0");
 
 export function dlDiff(date, time) {
     if (!date) return null;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
     const nd = new Date(); nd.setHours(0, 0, 0, 0);
     const dl = new Date(date + (time ? "T" + time : "T23:59"));
+    if (isNaN(dl.getTime())) return null;
     const dd = new Date(dl.getFullYear(), dl.getMonth(), dl.getDate());
     return Math.floor((dd - nd) / 86400000);
 }
@@ -21,6 +23,7 @@ export function dlStatus(date, time) {
 export function dlBadge(date, time) {
     const diff = dlDiff(date, time);
     if (diff === null) return null;
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
     const dl = new Date(date + (time ? "T" + time : "T23:59"));
     const lbl = `${MONTHS[dl.getMonth()]} ${dl.getDate()}${time ? " · " + time : ""}`;
     if (diff > 2) return { type: "green", text: lbl };

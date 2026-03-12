@@ -126,6 +126,7 @@ export default function MobileKanbanView({ stages, tasks, onEdit, onAdd, onMove,
                                     onEdit={() => onEdit(t)}
                                     onMove={onMove}
                                     onDuplicate={onDuplicate}
+                                    isDoneCol={activeStage.id === "done" || activeStage.label?.toLowerCase() === "done"}
                                 />
                                 {/* ── Move to stage row ── */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 4px 10px", flexWrap: "wrap" }}>

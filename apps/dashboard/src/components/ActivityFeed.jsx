@@ -23,7 +23,7 @@ export default function ActivityFeed({ project, onClose }) {
     }, [project, loadLogs]);
 
     const formatAction = (log) => {
-        const who = log.users?.email?.split("@")[0] || "Someone";
+        const who = log.profiles?.email?.split("@")[0] || "Someone";
         const details = log.details || {};
         switch (log.action) {
             case "task_created": return `✨ ${who} created task "${details.title}"`;

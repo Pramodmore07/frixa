@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NOTE_COLORS } from "../components/modals/NoteModal";
 
 const PAGE_SIZE = 12;
@@ -38,6 +38,11 @@ function Pagination({ page, total, pageSize, onChange }) {
 
 export default function NotesPage({ notes, onEdit, onAdd }) {
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset to page 1 if current page would be empty after data changes (e.g. project switch)
+    useEffect(() => {
+        if (currentPage > 1 && (currentPage - 1) * PAGE_SIZE >= notes.length) setCurrentPage(1);
+    }, [notes.length, currentPage]);
 
     const sorted = [...notes].sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;

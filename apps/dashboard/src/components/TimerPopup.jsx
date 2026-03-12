@@ -20,7 +20,7 @@ export default function TimerPopup({ label, onClose }) {
                 </h2>
                 <p style={{ fontSize: 14, color: "#6B7280", lineHeight: 1.65, marginBottom: 28 }}>
                     {label ? `"${label}" complete.` : "Your focus session is complete."}<br />
-                    Awesome work, Pramod! 🚀
+                    Great work, keep it up! 🚀
                 </p>
                 <button
                     onClick={onClose}

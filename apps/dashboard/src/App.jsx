@@ -102,6 +102,7 @@ export default function App() {
   const exitGuestMode = useCallback(() => {
     setGuestMode(false);
     setTasks([]); setIdeas([]); setStages(DEFAULT_STAGES); setNotes([]); setCurrentProject(null);
+    setNextId(100);
     ls.set(SESSION_PROJECT_KEY, null);
     ls.set(SESSION_PAGE_KEY, "roadmap");
   }, []);
@@ -225,7 +226,7 @@ export default function App() {
         () => {
           clearTimeout(taskTimer);
           taskTimer = setTimeout(() => {
-            fetchTasks(pid).then(({ data }) => { if (data) setTasks(data.map(dbToTask)); });
+            fetchTasks(pid).then(({ data }) => { if (data) setTasks(data.map(dbToTask)); }).catch(() => {});
           }, 150);
         }
       )
@@ -233,7 +234,7 @@ export default function App() {
         () => {
           clearTimeout(ideaTimer);
           ideaTimer = setTimeout(() => {
-            fetchIdeas(pid).then(({ data }) => { if (data) setIdeas(data.map(dbToIdea)); });
+            fetchIdeas(pid).then(({ data }) => { if (data) setIdeas(data.map(dbToIdea)); }).catch(() => {});
           }, 150);
         }
       )
@@ -241,7 +242,7 @@ export default function App() {
         () => {
           clearTimeout(stageTimer);
           stageTimer = setTimeout(() => {
-            fetchStages(pid).then(({ data }) => { if (data?.length > 0) setStages(data.map(dbToStage)); });
+            fetchStages(pid).then(({ data }) => { if (data?.length > 0) setStages(data.map(dbToStage)); }).catch(() => {});
           }, 150);
         }
       )
@@ -249,7 +250,7 @@ export default function App() {
         () => {
           clearTimeout(noteTimer);
           noteTimer = setTimeout(() => {
-            fetchNotes(pid).then(({ data }) => { if (data) setNotes(data.map(dbToNote)); });
+            fetchNotes(pid).then(({ data }) => { if (data) setNotes(data.map(dbToNote)); }).catch(() => {});
           }, 150);
         }
       )
@@ -257,20 +258,22 @@ export default function App() {
 
     return () => {
       clearTimeout(taskTimer); clearTimeout(ideaTimer); clearTimeout(stageTimer); clearTimeout(noteTimer);
+      channel.unsubscribe();
       supabase.removeChannel(channel);
     };
-  }, [user, currentProject?.id, guestMode]);
+  }, [user, currentProject, guestMode]);
 
   const guestSave = (key, val) => ls.set(key, val);
 
   /* ── Task CRUD ── */
   const saveTask = useCallback(async (form) => {
     if (form.id) {
-      // UPDATE — optimistic update is safe, no tempId issue
-      setTasks((prev) => { const next = prev.map((t) => t.id === form.id ? { ...t, ...form } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
+      // UPDATE — optimistic update with rollback on failure
+      let snapshot;
+      setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === form.id ? { ...t, ...form } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
       if (!guestMode && currentProject) {
         const { error } = await updateTask(form.id, taskToDb(form, user.id, currentProject.id));
-        if (error) showToast("Failed to save task.");
+        if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to save task."); }
         // realtime will sync to other members
       }
     } else {
@@ -308,6 +311,11 @@ export default function App() {
     setTaskModal(null);
   }, [guestMode, nextId, tasks, user, currentProject, showToast]);
 
+  const isDoneStage = useCallback((stageId) => {
+    const s = stages.find((st) => st.id === stageId);
+    return s ? (s.id === "done" || s.label.toLowerCase() === "done") : false;
+  }, [stages]);
+
   const patchTask = useCallback(async (id, patches) => {
     const dbPatches = {};
     if ("title" in patches) dbPatches.title = patches.title;
@@ -319,13 +327,16 @@ export default function App() {
     if ("archived" in patches) dbPatches.archived = patches.archived;
     if ("sortOrder" in patches) dbPatches.sort_order = patches.sortOrder;
 
-    setTasks((prev) => prev.map((t) => t.id === id ? { ...t, ...patches } : t));
+    if ("status" in patches && isDoneStage(patches.status)) spawnConfetti();
+
+    let snapshot;
+    setTasks((prev) => { snapshot = prev; return prev.map((t) => t.id === id ? { ...t, ...patches } : t); });
     if (!guestMode && currentProject) {
       const { error } = await updateTask(id, dbPatches);
-      if (error) { showToast("Failed to update task."); return; }
+      if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to update task."); return; }
       await logActivity(currentProject.id, user.id, "task_patched", { id, patches: Object.keys(patches) });
     }
-  }, [guestMode, currentProject, user, showToast]);
+  }, [guestMode, currentProject, user, showToast, isDoneStage]);
 
   const moveTask = useCallback(async (dragged, targetCol, anchorId, position) => {
     let reordered;
@@ -343,28 +354,33 @@ export default function App() {
       if (guestMode) guestSave(GUEST_TASKS_KEY, next);
       return next;
     });
+    if (isDoneStage(targetCol)) spawnConfetti();
     if (!guestMode && reordered && currentProject) {
       await Promise.all(reordered.map((t) => updateTask(t.id, { status: targetCol, sort_order: t.sortOrder })));
       await logActivity(currentProject.id, user.id, "tasks_reordered", { status: targetCol });
     }
-  }, [guestMode, currentProject, user]);
+  }, [guestMode, currentProject, user, isDoneStage]);
 
   const archiveTask = useCallback(async (id) => {
-    setTasks((prev) => { const next = prev.map((t) => t.id === id ? { ...t, archived: true } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
+    let snapshot;
+    setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === id ? { ...t, archived: true } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     setTaskModal(null);
     if (!guestMode && currentProject) {
-      await updateTask(id, { archived: true });
+      const { error } = await updateTask(id, { archived: true });
+      if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to archive task."); return; }
       await logActivity(currentProject.id, user.id, "task_archived", { id });
     }
-  }, [guestMode, currentProject, user]);
+  }, [guestMode, currentProject, user, showToast]);
 
   const restoreTask = useCallback(async (id) => {
-    setTasks((prev) => { const next = prev.map((t) => t.id === id ? { ...t, archived: false, status: stages[0]?.id ?? "planned" } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
+    let snapshot;
+    setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === id ? { ...t, archived: false, status: stages[0]?.id ?? "planned" } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     if (!guestMode && currentProject) {
-      await updateTask(id, { archived: false, status: stages[0]?.id ?? "planned" });
+      const { error } = await updateTask(id, { archived: false, status: stages[0]?.id ?? "planned" });
+      if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to restore task."); return; }
       await logActivity(currentProject.id, user.id, "task_restored", { id });
     }
-  }, [guestMode, currentProject, user, stages]);
+  }, [guestMode, currentProject, user, stages, showToast]);
 
   const deleteTask = useCallback(async (id) => {
     setTasks((prev) => { const next = prev.filter((t) => t.id !== id); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
@@ -439,15 +455,16 @@ export default function App() {
   }, [guestMode, currentProject]);
 
   const voteIdea = useCallback(async (id) => {
-    setIdeas((prev) => prev.map((x) => x.id === id ? { ...x, voted: !x.voted, votes: x.votes + (x.voted ? -1 : 1) } : x));
-    if (!guestMode && currentProject) {
-      const idea = ideas.find((i) => i.id === id);
-      if (idea) {
-        await updateIdea(id, { voted: !idea.voted, votes: idea.votes + (idea.voted ? -1 : 1) });
-        await logActivity(currentProject.id, user.id, "idea_voted", { title: idea.title });
-      }
+    let currentIdea;
+    setIdeas((prev) => {
+      currentIdea = prev.find((i) => i.id === id);
+      return prev.map((x) => x.id === id ? { ...x, voted: !x.voted, votes: x.votes + (x.voted ? -1 : 1) } : x);
+    });
+    if (!guestMode && currentProject && currentIdea) {
+      await updateIdea(id, { voted: !currentIdea.voted, votes: currentIdea.votes + (currentIdea.voted ? -1 : 1) });
+      await logActivity(currentProject.id, user.id, "idea_voted", { title: currentIdea.title });
     }
-  }, [guestMode, currentProject, ideas, user]);
+  }, [guestMode, currentProject, user]);
 
   /* ── Notes CRUD ── */
   const archiveNote = useCallback(async (id) => {

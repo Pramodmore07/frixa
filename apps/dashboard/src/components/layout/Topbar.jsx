@@ -122,7 +122,7 @@ export default function Topbar({ page, setPage, user, guestMode, currentProject,
     };
 
     const handleCreate = async () => {
-        if (!newName.trim()) return;
+        if (!newName.trim() || saving) return;
         setSaving(true);
         const { data, error } = await createProject(newName.trim(), user.id);
         setSaving(false);

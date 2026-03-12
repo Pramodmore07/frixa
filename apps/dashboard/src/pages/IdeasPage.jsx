@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CAT_COLORS } from "../constants";
 
 const PAGE_SIZE = 10;
@@ -76,6 +76,11 @@ function Pagination({ page, total, pageSize, onChange }) {
 
 export default function IdeasPage({ ideas, onVote, onEdit, onAdd }) {
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset to page 1 if current page would be empty after data changes (e.g. project switch)
+    useEffect(() => {
+        if (currentPage > 1 && (currentPage - 1) * PAGE_SIZE >= ideas.length) setCurrentPage(1);
+    }, [ideas.length, currentPage]);
 
     // Sort newest first (by createdAt string or id fallback)
     const sorted = [...ideas].sort((a, b) => {

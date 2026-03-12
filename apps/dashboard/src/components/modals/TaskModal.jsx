@@ -47,8 +47,13 @@ export default function TaskModal({ mode, initial, stages = [], onSave, onArchiv
                 </FG>
             </Row2>
             <Row2>
-                <FG label="Deadline Date"><IOSDatePicker {...field("date")} /></FG>
-                <FG label="Deadline Time"><IOSTimePicker {...field("time")} /></FG>
+                <FG label="Deadline Date (optional)">
+                    <IOSDatePicker
+                        value={form.date}
+                        onChange={(e) => setForm((f) => ({ ...f, date: e.target.value, time: e.target.value ? f.time : "" }))}
+                    />
+                </FG>
+                <FG label="Deadline Time (optional)"><IOSTimePicker {...field("time")} /></FG>
             </Row2>
             <FG label="Tags (comma separated)">
                 <Input {...field("tags")} placeholder="#Marketing, #Tech, #Launch" />

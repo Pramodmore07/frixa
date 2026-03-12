@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import TaskCard from "./TaskCard";
 
 export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove, onDuplicate }) {
+    const isDoneCol = col.id === "done" || col.label?.toLowerCase() === "done";
     const [over, setOver] = useState(false);
     const ref = useRef(null);
 
@@ -9,7 +10,7 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
     const onDragLeave = (e) => { if (!ref.current?.contains(e.relatedTarget)) setOver(false); };
     const onDrop = (e) => {
         e.preventDefault(); setOver(false);
-        const id = parseInt(e.dataTransfer.getData("taskId"));
+        const id = e.dataTransfer.getData("taskId");
         if (id) onMove(id, col.id, null, "end");
     };
 
@@ -103,6 +104,7 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
                             onEdit={() => onEdit(t)}
                             onMove={onMove}
                             onDuplicate={onDuplicate}
+                            isDoneCol={isDoneCol}
                         />
                     ))
                 )}
