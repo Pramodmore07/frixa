@@ -105,6 +105,11 @@ export default function App() {
     setNextId(100);
     ls.set(SESSION_PROJECT_KEY, null);
     ls.set(SESSION_PAGE_KEY, "roadmap");
+    // Clear guest data from localStorage for privacy on sign-in
+    ls.set(GUEST_TASKS_KEY, null);
+    ls.set(GUEST_IDEAS_KEY, null);
+    ls.set(GUEST_STAGES_KEY, null);
+    ls.set(GUEST_NOTES_KEY, null);
   }, []);
 
   /* ── Supabase auth ── */
@@ -157,12 +162,20 @@ export default function App() {
   }, [currentProject, guestMode]);
 
   /* ── Handle invite link: ?invite=<projectId> ── */
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   useEffect(() => {
     if (!user) return;
     const params = new URLSearchParams(window.location.search);
-    const inviteId = params.get("invite");
-    if (!inviteId) return;
+    const rawInvite = params.get("invite");
+    if (!rawInvite) return;
+    // Strip invite param regardless of validity to prevent referrer leakage
     window.history.replaceState({}, "", window.location.pathname);
+    // Validate: must be a UUID (max 36 chars) to prevent injection
+    if (!UUID_RE.test(rawInvite.slice(0, 36))) {
+      showToast("Invalid invite link.");
+      return;
+    }
+    const inviteId = rawInvite.slice(0, 36);
     (async () => {
       try {
         await joinProjectByInvite(inviteId, user.id);
@@ -173,7 +186,7 @@ export default function App() {
         showToast("Failed to join project via invite link.");
       }
     })();
-  }, [user, showToast]);
+  }, [user, showToast]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Load project data ── */
   const loadData = useCallback(async (projectId) => {
@@ -272,7 +285,7 @@ export default function App() {
       let snapshot;
       setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === form.id ? { ...t, ...form } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
       if (!guestMode && currentProject) {
-        const { error } = await updateTask(form.id, taskToDb(form, user.id, currentProject.id));
+        const { error } = await updateTask(form.id, taskToDb(form, user.id, currentProject.id), currentProject.id);
         if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to save task."); }
         // realtime will sync to other members
       }
@@ -332,7 +345,7 @@ export default function App() {
     let snapshot;
     setTasks((prev) => { snapshot = prev; return prev.map((t) => t.id === id ? { ...t, ...patches } : t); });
     if (!guestMode && currentProject) {
-      const { error } = await updateTask(id, dbPatches);
+      const { error } = await updateTask(id, dbPatches, currentProject.id);
       if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to update task."); return; }
       await logActivity(currentProject.id, user.id, "task_patched", { id, patches: Object.keys(patches) });
     }
@@ -358,7 +371,7 @@ export default function App() {
     });
     if (isDoneStage(targetCol)) spawnConfetti();
     if (!guestMode && reordered && currentProject) {
-      await Promise.all(reordered.map((t) => updateTask(t.id, { status: targetCol, sort_order: t.sortOrder })));
+      await Promise.all(reordered.map((t) => updateTask(t.id, { status: targetCol, sort_order: t.sortOrder }, currentProject.id)));
       await logActivity(currentProject.id, user.id, "tasks_reordered", { status: targetCol });
     }
   }, [guestMode, currentProject, user, isDoneStage]);
@@ -368,7 +381,7 @@ export default function App() {
     setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === id ? { ...t, archived: true } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     setTaskModal(null);
     if (!guestMode && currentProject) {
-      const { error } = await updateTask(id, { archived: true });
+      const { error } = await updateTask(id, { archived: true }, currentProject.id);
       if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to archive task."); return; }
       await logActivity(currentProject.id, user.id, "task_archived", { id });
     }
@@ -378,7 +391,7 @@ export default function App() {
     let snapshot;
     setTasks((prev) => { snapshot = prev; const next = prev.map((t) => t.id === id ? { ...t, archived: false, status: stages[0]?.id ?? "planned" } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     if (!guestMode && currentProject) {
-      const { error } = await updateTask(id, { archived: false, status: stages[0]?.id ?? "planned" });
+      const { error } = await updateTask(id, { archived: false, status: stages[0]?.id ?? "planned" }, currentProject.id);
       if (error) { if (snapshot) setTasks(snapshot); showToast("Failed to restore task."); return; }
       await logActivity(currentProject.id, user.id, "task_restored", { id });
     }
@@ -387,7 +400,7 @@ export default function App() {
   const deleteTask = useCallback(async (id) => {
     setTasks((prev) => { const next = prev.filter((t) => t.id !== id); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     if (!guestMode && currentProject) {
-      await deleteTaskById(id);
+      await deleteTaskById(id, currentProject.id);
       await logActivity(currentProject.id, user.id, "task_deleted", { id });
     }
   }, [guestMode, currentProject, user]);
@@ -424,7 +437,7 @@ export default function App() {
       // UPDATE — use state updater to avoid stale closure when saving to localStorage
       setIdeas((prev) => { const next = prev.map((x) => x.id === form.id ? { ...x, ...form } : x); if (guestMode) guestSave(GUEST_IDEAS_KEY, next); return next; });
       if (!guestMode && currentProject) {
-        const { error } = await updateIdea(form.id, ideaToDb(form, user.id, currentProject.id));
+        const { error } = await updateIdea(form.id, ideaToDb(form, user.id, currentProject.id), currentProject.id);
         if (error) showToast("Failed to update idea.");
       }
     } else {
@@ -453,7 +466,7 @@ export default function App() {
   const handleDeleteIdea = useCallback(async (id) => {
     setIdeas((prev) => { const next = prev.filter((x) => x.id !== id); if (guestMode) guestSave(GUEST_IDEAS_KEY, next); return next; });
     setIdeaModal(null);
-    if (!guestMode && currentProject) await deleteIdea(id);
+    if (!guestMode && currentProject) await deleteIdea(id, currentProject.id);
   }, [guestMode, currentProject]);
 
   const voteIdea = useCallback(async (id) => {
@@ -463,7 +476,7 @@ export default function App() {
       return prev.map((x) => x.id === id ? { ...x, voted: !x.voted, votes: x.votes + (x.voted ? -1 : 1) } : x);
     });
     if (!guestMode && currentProject && currentIdea) {
-      await updateIdea(id, { voted: !currentIdea.voted, votes: currentIdea.votes + (currentIdea.voted ? -1 : 1) });
+      await updateIdea(id, { voted: !currentIdea.voted, votes: currentIdea.votes + (currentIdea.voted ? -1 : 1) }, currentProject.id);
       await logActivity(currentProject.id, user.id, "idea_voted", { title: currentIdea.title });
     }
   }, [guestMode, currentProject, user]);
@@ -477,7 +490,7 @@ export default function App() {
     });
     setNoteModal(null);
     if (!guestMode && currentProject) {
-      const { error } = await updateNote(id, { archived: true });
+      const { error } = await updateNote(id, { archived: true }, currentProject.id);
       if (error) showToast("Failed to archive note.");
     }
   }, [guestMode, currentProject, showToast]);
@@ -489,7 +502,7 @@ export default function App() {
       return next;
     });
     if (!guestMode && currentProject) {
-      const { error } = await updateNote(id, { archived: false });
+      const { error } = await updateNote(id, { archived: false }, currentProject.id);
       if (error) showToast("Failed to restore note.");
     }
   }, [guestMode, currentProject, showToast]);
@@ -511,7 +524,7 @@ export default function App() {
       // UPDATE
       setNotes((prev) => prev.map((n) => n.id === form.id ? { ...n, ...form } : n));
       if (currentProject) {
-        const { error } = await updateNote(form.id, noteToDb(form, user.id, currentProject.id));
+        const { error } = await updateNote(form.id, noteToDb(form, user.id, currentProject.id), currentProject.id);
         if (error) showToast("Failed to update note.");
       }
     } else {
@@ -539,7 +552,7 @@ export default function App() {
       if (guestMode) ls.set(GUEST_NOTES_KEY, next);
       return next;
     });
-    if (!guestMode && currentProject) await deleteNoteById(id);
+    if (!guestMode && currentProject) await deleteNoteById(id, currentProject.id);
   }, [guestMode, currentProject]);
 
   /* ── Settings ── */
@@ -558,7 +571,7 @@ export default function App() {
 
   const removeStage = useCallback(async (stageId) => {
     setStages((prev) => prev.filter((s) => s.id !== stageId));
-    if (!guestMode && currentProject) await deleteStage(stageId);
+    if (!guestMode && currentProject) await deleteStage(stageId, currentProject.id);
   }, [guestMode, currentProject]);
 
   /* ── Switch project ── */

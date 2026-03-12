@@ -17,7 +17,10 @@ export default function TaskModal({ mode, initial, stages = [], onSave, onArchiv
         if (!form.title.trim()) return;
         const out = {
             ...form,
-            tags: form.tags.split(",").map((s) => s.trim()).filter(Boolean),
+            title: form.title.trim().slice(0, 200),
+            desc: (form.desc || "").slice(0, 5000),
+            // Limit to 20 tags, each max 50 chars
+            tags: form.tags.split(",").map((s) => s.trim().slice(0, 50)).filter(Boolean).slice(0, 20),
         };
         if (initial?.id) out.id = initial.id;
         onSave(out);

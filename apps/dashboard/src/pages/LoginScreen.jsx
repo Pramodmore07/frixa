@@ -50,13 +50,8 @@ export default function LoginScreen({ onGuestMode }) {
             } else {
                 const { error: err } = await supabase.auth.signInWithPassword({ email, password });
                 if (err) {
-                    if (err.message.toLowerCase().includes("email not confirmed")) {
-                        setError("Please verify your email first. Check your inbox for a confirmation link.");
-                    } else if (err.message.toLowerCase().includes("invalid login credentials")) {
-                        setError("Wrong email or password. Don't have an account? Click Sign up below.");
-                    } else {
-                        setError(err.message);
-                    }
+                    // Generic message prevents user enumeration (avoids revealing if email exists/is confirmed)
+                    setError("Incorrect email or password. If you just signed up, check your inbox for a confirmation link.");
                 }
             }
         } finally {

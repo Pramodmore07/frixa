@@ -217,12 +217,21 @@ export async function fetchActivity(projectId) {
         .limit(20);
 }
 
+// Allowlist of valid action types to prevent arbitrary strings being logged
+const VALID_ACTIONS = new Set([
+    "task_patched", "task_archived", "task_restored", "task_deleted",
+    "tasks_reordered", "idea_voted",
+]);
+
 export async function logActivity(projectId, userId, action, details = {}) {
+    if (!VALID_ACTIONS.has(action)) return; // silently ignore unknown actions
+    // Serialize and cap details to prevent oversized payloads
+    const safeDetails = JSON.parse(JSON.stringify(details).slice(0, 1024));
     return supabase.from("activity_log").insert({
         project_id: projectId,
         user_id: userId,
         action,
-        details
+        details: safeDetails,
     });
 }
 
@@ -240,12 +249,16 @@ export async function insertTask(taskDb) {
     return supabase.from("tasks").insert(taskDb).select().single();
 }
 
-export async function updateTask(id, changes) {
-    return supabase.from("tasks").update(changes).eq("id", id);
+export async function updateTask(id, changes, projectId) {
+    let q = supabase.from("tasks").update(changes).eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
-export async function deleteTaskById(id) {
-    return supabase.from("tasks").delete().eq("id", id);
+export async function deleteTaskById(id, projectId) {
+    let q = supabase.from("tasks").delete().eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -262,12 +275,16 @@ export async function insertIdea(ideaDb) {
     return supabase.from("ideas").insert(ideaDb).select().single();
 }
 
-export async function updateIdea(id, changes) {
-    return supabase.from("ideas").update(changes).eq("id", id);
+export async function updateIdea(id, changes, projectId) {
+    let q = supabase.from("ideas").update(changes).eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
-export async function deleteIdea(id) {
-    return supabase.from("ideas").delete().eq("id", id);
+export async function deleteIdea(id, projectId) {
+    let q = supabase.from("ideas").delete().eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -292,8 +309,10 @@ export async function upsertStages(stages, userId, projectId) {
     return supabase.from("stages").upsert(rows, { onConflict: "id,project_id" });
 }
 
-export async function deleteStage(id) {
-    return supabase.from("stages").delete().eq("id", id);
+export async function deleteStage(id, projectId) {
+    let q = supabase.from("stages").delete().eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -310,10 +329,14 @@ export async function insertNote(noteDb) {
     return supabase.from("notes").insert(noteDb).select().single();
 }
 
-export async function updateNote(id, changes) {
-    return supabase.from("notes").update(changes).eq("id", id);
+export async function updateNote(id, changes, projectId) {
+    let q = supabase.from("notes").update(changes).eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }
 
-export async function deleteNoteById(id) {
-    return supabase.from("notes").delete().eq("id", id);
+export async function deleteNoteById(id, projectId) {
+    let q = supabase.from("notes").delete().eq("id", id);
+    if (projectId) q = q.eq("project_id", projectId);
+    return q;
 }

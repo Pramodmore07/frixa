@@ -56,6 +56,12 @@ export default function CollaboratorsModal({ project, user, onClose }) {
     const handleInvite = async () => {
         const trimmed = email.trim().toLowerCase();
         if (!trimmed) return;
+        // Basic email format validation before sending to API
+        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        if (!emailRe.test(trimmed) || trimmed.length > 254) {
+            setInviteError("Please enter a valid email address.");
+            return;
+        }
         setInviteError("");
         setInviteSuccess("");
         setInviting(true);

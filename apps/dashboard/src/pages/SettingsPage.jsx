@@ -177,8 +177,9 @@ export default function SettingsPage({
                     <input
                         className="settings-input"
                         value={displayName}
-                        onChange={e => setDisplayName(e.target.value)}
+                        onChange={e => setDisplayName(e.target.value.slice(0, 60))}
                         placeholder="Your name"
+                        maxLength={60}
                         style={{
                             padding: "8px 12px", border: "1.5px solid #E8EAED", borderRadius: 10,
                             fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 500,
@@ -260,14 +261,14 @@ export default function SettingsPage({
                             Supabase Auth
                         </span>
                     </Row>
-                    <Row label="User ID" desc="Your unique Supabase user identifier">
+                    <Row label="User ID" desc="Your unique identifier (partially masked)">
                         <span style={{
                             fontSize: 11, fontWeight: 500, color: "#9CA3AF", background: "#F4F5F7",
                             padding: "5px 10px", borderRadius: 8, fontFamily: "monospace",
                             maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                             display: "block",
                         }}>
-                            {user?.id || "—"}
+                            {user?.id ? `${user.id.slice(0, 8)}••••••••` : "—"}
                         </span>
                     </Row>
                     <Row label="Member Since" desc="When your account was created">
