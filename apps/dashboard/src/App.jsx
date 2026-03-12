@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "./lib/supabase";
 import {
   fetchTasks, fetchIdeas, fetchStages, fetchNotes,
@@ -81,9 +81,11 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [nextId, setNextId] = useState(100);
 
+  const toastTimer = useRef(null);
   const showToast = useCallback((msg, type = "error") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
     setToast({ msg, type });
-    setTimeout(() => setToast(null), 4000);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
   }, []);
 
   /* ── Guest mode ── */
@@ -161,11 +163,16 @@ export default function App() {
     if (!inviteId) return;
     window.history.replaceState({}, "", window.location.pathname);
     (async () => {
-      await joinProjectByInvite(inviteId, user.id);
-      const { data } = await fetchProjectById(inviteId);
-      if (data) { setCurrentProject(data); setPage("roadmap"); }
+      try {
+        await joinProjectByInvite(inviteId, user.id);
+        const { data } = await fetchProjectById(inviteId);
+        if (data) { setCurrentProject(data); setPage("roadmap"); }
+        else showToast("Invite link is invalid or the project no longer exists.");
+      } catch {
+        showToast("Failed to join project via invite link.");
+      }
     })();
-  }, [user]);
+  }, [user, showToast]);
 
   /* ── Load project data ── */
   const loadData = useCallback(async (projectId) => {
@@ -314,10 +321,11 @@ export default function App() {
 
     setTasks((prev) => prev.map((t) => t.id === id ? { ...t, ...patches } : t));
     if (!guestMode && currentProject) {
-      await updateTask(id, dbPatches);
+      const { error } = await updateTask(id, dbPatches);
+      if (error) { showToast("Failed to update task."); return; }
       await logActivity(currentProject.id, user.id, "task_patched", { id, patches: Object.keys(patches) });
     }
-  }, [guestMode, currentProject, user]);
+  }, [guestMode, currentProject, user, showToast]);
 
   const moveTask = useCallback(async (dragged, targetCol, anchorId, position) => {
     let reordered;
@@ -342,7 +350,7 @@ export default function App() {
   }, [guestMode, currentProject, user]);
 
   const archiveTask = useCallback(async (id) => {
-    setTasks((prev) => prev.map((t) => t.id === id ? { ...t, archived: true } : t));
+    setTasks((prev) => { const next = prev.map((t) => t.id === id ? { ...t, archived: true } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     setTaskModal(null);
     if (!guestMode && currentProject) {
       await updateTask(id, { archived: true });
@@ -351,7 +359,7 @@ export default function App() {
   }, [guestMode, currentProject, user]);
 
   const restoreTask = useCallback(async (id) => {
-    setTasks((prev) => prev.map((t) => t.id === id ? { ...t, archived: false, status: stages[0]?.id ?? "planned" } : t));
+    setTasks((prev) => { const next = prev.map((t) => t.id === id ? { ...t, archived: false, status: stages[0]?.id ?? "planned" } : t); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     if (!guestMode && currentProject) {
       await updateTask(id, { archived: false, status: stages[0]?.id ?? "planned" });
       await logActivity(currentProject.id, user.id, "task_restored", { id });
@@ -359,7 +367,7 @@ export default function App() {
   }, [guestMode, currentProject, user, stages]);
 
   const deleteTask = useCallback(async (id) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setTasks((prev) => { const next = prev.filter((t) => t.id !== id); if (guestMode) guestSave(GUEST_TASKS_KEY, next); return next; });
     if (!guestMode && currentProject) {
       await deleteTaskById(id);
       await logActivity(currentProject.id, user.id, "task_deleted", { id });
@@ -395,13 +403,12 @@ export default function App() {
   /* ── Ideas CRUD ── */
   const saveIdea = useCallback(async (form) => {
     if (form.id) {
-      // UPDATE — optimistic is safe for edits
-      setIdeas((prev) => prev.map((x) => x.id === form.id ? { ...x, ...form } : x));
+      // UPDATE — use state updater to avoid stale closure when saving to localStorage
+      setIdeas((prev) => { const next = prev.map((x) => x.id === form.id ? { ...x, ...form } : x); if (guestMode) guestSave(GUEST_IDEAS_KEY, next); return next; });
       if (!guestMode && currentProject) {
         const { error } = await updateIdea(form.id, ideaToDb(form, user.id, currentProject.id));
         if (error) showToast("Failed to update idea.");
       }
-      if (guestMode) guestSave(GUEST_IDEAS_KEY, ideas.map((x) => x.id === form.id ? { ...x, ...form } : x));
     } else {
       if (guestMode) {
         const newIdea = { ...form, id: Date.now(), votes: 0, voted: false, createdAt: new Date().toLocaleDateString() };
@@ -423,10 +430,10 @@ export default function App() {
       }
     }
     setIdeaModal(null);
-  }, [guestMode, currentProject, user, showToast, ideas]);
+  }, [guestMode, currentProject, user, showToast]);
 
   const handleDeleteIdea = useCallback(async (id) => {
-    setIdeas((prev) => prev.filter((x) => x.id !== id));
+    setIdeas((prev) => { const next = prev.filter((x) => x.id !== id); if (guestMode) guestSave(GUEST_IDEAS_KEY, next); return next; });
     setIdeaModal(null);
     if (!guestMode && currentProject) await deleteIdea(id);
   }, [guestMode, currentProject]);
@@ -450,8 +457,11 @@ export default function App() {
       return next;
     });
     setNoteModal(null);
-    if (!guestMode && currentProject) await updateNote(id, { archived: true });
-  }, [guestMode, currentProject]);
+    if (!guestMode && currentProject) {
+      const { error } = await updateNote(id, { archived: true });
+      if (error) showToast("Failed to archive note.");
+    }
+  }, [guestMode, currentProject, showToast]);
 
   const restoreNote = useCallback(async (id) => {
     setNotes((prev) => {
@@ -459,8 +469,11 @@ export default function App() {
       if (guestMode) ls.set(GUEST_NOTES_KEY, next);
       return next;
     });
-    if (!guestMode && currentProject) await updateNote(id, { archived: false });
-  }, [guestMode, currentProject]);
+    if (!guestMode && currentProject) {
+      const { error } = await updateNote(id, { archived: false });
+      if (error) showToast("Failed to restore note.");
+    }
+  }, [guestMode, currentProject, showToast]);
 
   const saveNote = useCallback(async (form) => {
     if (guestMode) {
