@@ -121,12 +121,10 @@ export default function SettingsPage({
 
     /* Appearance */
     const [showTimer, setShowTimer] = useState(settings.showTimer ?? false);
-    const [appSaved, setAppSaved] = useState(false);
 
-    const saveAppearance = () => {
-        onSave({ showTimer });
-        setAppSaved(true);
-        setTimeout(() => setAppSaved(false), 2000);
+    const handleTimerToggle = (val) => {
+        setShowTimer(val);
+        onSave({ showTimer: val });
     };
 
     /* Workspace / Stages */
@@ -202,11 +200,8 @@ export default function SettingsPage({
             {/* ── Appearance ── */}
             <Section title="Appearance" desc="Customize how the app looks and behaves">
                 <Row label="Focus Timer" desc="Show the focus session countdown timer on the Roadmap page">
-                    <Toggle value={showTimer} onChange={setShowTimer} />
+                    <Toggle value={showTimer} onChange={handleTimerToggle} />
                 </Row>
-                <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 16 }}>
-                    <SaveBtn saved={appSaved} onClick={saveAppearance} />
-                </div>
             </Section>
 
             {/* ── Workspace ── */}
