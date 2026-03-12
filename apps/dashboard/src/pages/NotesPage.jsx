@@ -133,7 +133,7 @@ export default function NotesPage({ notes, onEdit, onAdd }) {
                                 {/* Color dot + title */}
                                 <div style={{ display: "flex", alignItems: "flex-start", gap: 8, paddingRight: note.pinned ? 22 : 0 }}>
                                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, flexShrink: 0, marginTop: 5 }} />
-                                    <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 14.5, fontWeight: 700, lineHeight: 1.35, color: "#111218", flex: 1 }}>{note.title}</span>
+                                    <span className="note-title" style={{ fontFamily: "'Poppins',sans-serif", fontSize: 14.5, fontWeight: 700, lineHeight: 1.35, color: "#111218", flex: 1 }}>{note.title}</span>
                                 </div>
 
                                 {/* Content preview */}

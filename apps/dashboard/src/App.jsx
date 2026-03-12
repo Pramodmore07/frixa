@@ -42,7 +42,7 @@ const SESSION_PAGE_KEY = "session_page_v1";
 
 const VALID_PAGES = ["roadmap", "ideas", "notes", "archive", "projects", "settings"];
 
-const DEFAULT_SETTINGS = { showTimer: false };
+const DEFAULT_SETTINGS = { showTimer: false, darkMode: false };
 
 function seedTasks() {
   return SEED_TASKS.map((t, i) => ({ ...t, id: i + 1, archived: false, sortOrder: t.sortOrder ?? i, createdAt: new Date().toLocaleDateString() }));
@@ -582,7 +582,7 @@ export default function App() {
   if (user && !currentProject) return <ProjectHome user={user} onSelectProject={setCurrentProject} />;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F4F5F7", fontFamily: "'Poppins',sans-serif" }}>
+    <div data-theme={settings.darkMode ? "dark" : "light"} style={{ minHeight: "100vh", background: settings.darkMode ? "#0F1117" : "#F4F5F7", fontFamily: "'Poppins',sans-serif", transition: "background .3s, color .3s" }}>
       {guestMode && (
         <div style={{ background: "#FEF9C3", borderBottom: "1px solid #FDE68A", padding: "8px 20px", fontSize: 12.5, color: "#78350F", fontWeight: 500 }}>
           <strong>Guest Mode</strong> — project features and activity logging are disabled.
@@ -609,6 +609,7 @@ export default function App() {
           <RoadmapPage
             tasks={tasks} stages={stages}
             showTimer={settings.showTimer}
+            darkMode={settings.darkMode}
             onEditTask={(t) => setTaskModal({ mode: "edit", data: t })}
             onAddTask={(status) => setTaskModal({ mode: "add", data: { status } })}
             onMoveTask={moveTask}
@@ -681,6 +682,37 @@ export default function App() {
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         @keyframes spin { to { transform:rotate(360deg); } }
+        /* ── Night Mode ── */
+        [data-theme="dark"] .roadmap-wrap h1,[data-theme="dark"] .ideas-wrap h1,[data-theme="dark"] .notes-wrap h1,[data-theme="dark"] .archive-wrap h1,[data-theme="dark"] .settings-wrap h1 { color: #E8EAF0 !important; }
+        [data-theme="dark"] .task-card { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .tc-title { color: #E8EAF0 !important; }
+        [data-theme="dark"] .tc-footer > div { background: #141620 !important; border-top-color: #2A2D3A !important; }
+        [data-theme="dark"] .task-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.4) !important; }
+        [data-theme="dark"] .view-switcher { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .view-tab { color: #6B7280 !important; background: transparent !important; }
+        [data-theme="dark"] .view-tab--active { background: #E8EAF0 !important; color: #111218 !important; }
+        [data-theme="dark"] .idea-hover { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .idea-title { color: #E8EAF0 !important; }
+        [data-theme="dark"] .archive-task-row { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .archive-tabs-bar { background: #161820 !important; }
+        [data-theme="dark"] .archive-total-card { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .arch-tab--active { background: #E8EAF0 !important; color: #111218 !important; }
+        [data-theme="dark"] .settings-section { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .settings-section-hdr { border-bottom-color: #2A2D3A !important; }
+        [data-theme="dark"] .settings-section-title { color: #E8EAF0 !important; }
+        [data-theme="dark"] .settings-row { border-bottom-color: #2A2D3A !important; }
+        [data-theme="dark"] .settings-row-label { color: #E8EAF0 !important; }
+        [data-theme="dark"] .settings-stage-pill { background: #252830 !important; color: #C4C9D4 !important; }
+        [data-theme="dark"] .settings-manage-btn { background: #252830 !important; border-color: #2A2D3A !important; color: #C4C9D4 !important; }
+        [data-theme="dark"] .settings-manage-btn:hover { background: #2E3142 !important; border-color: #4A4F6A !important; }
+        [data-theme="dark"] .settings-input { background: #252830 !important; border-color: #2A2D3A !important; color: #E8EAF0 !important; }
+        [data-theme="dark"] .settings-email-box { background: #1A1C25 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .frixa-toggle[data-checked="true"] { background: #4F80FF !important; }
+        [data-theme="dark"] .frixa-toggle[data-checked="false"] { background: #3A3D4E !important; }
+        [data-theme="dark"] .pg-btn { background: #1A1C25 !important; border-color: #2A2D3A !important; color: #9CA3AF !important; }
+        [data-theme="dark"] .pg-btn:hover { background: #252830 !important; border-color: #4A4F6A !important; }
+        [data-theme="dark"] .note-hover { background: #1E2130 !important; border-color: #2A2D3A !important; }
+        [data-theme="dark"] .note-title { color: #E8EAF0 !important; }
       `}</style>
     </div>
   );

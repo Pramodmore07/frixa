@@ -168,7 +168,7 @@ export default function IdeasPage({ ideas, onVote, onEdit, onAdd }) {
                                 }}
                             >
                                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-                                    <span style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 600, lineHeight: 1.38, color: "#111218", flex: 1 }}>{idea.title}</span>
+                                    <span className="idea-title" style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 600, lineHeight: 1.38, color: "#111218", flex: 1 }}>{idea.title}</span>
                                     <span style={{
                                         fontSize: "9.5px", fontWeight: 700, padding: "3px 9px", borderRadius: 4,
                                         textTransform: "uppercase", letterSpacing: ".07em", flexShrink: 0,

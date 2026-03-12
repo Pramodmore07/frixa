@@ -66,6 +66,7 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete, n
     const tabBtn = (key, label, count) => (
         <button
             onClick={() => setTab(key)}
+            className={tab === key ? "arch-tab arch-tab--active" : "arch-tab"}
             style={{
                 padding: "8px 20px", border: "none", borderRadius: 10,
                 fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 600,
@@ -91,14 +92,14 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete, n
                     <h1 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 28, fontWeight: 700, letterSpacing: "-.5px", color: "#111218" }}>Archive</h1>
                     <p style={{ fontSize: 13.5, color: "#6B7280", marginTop: 5 }}>Archived tasks &amp; notes</p>
                 </div>
-                <div style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "10px 18px", textAlign: "center", minWidth: 72 }}>
+                <div className="archive-total-card" style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "10px 18px", textAlign: "center", minWidth: 72 }}>
                     <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 24, fontWeight: 700, color: "#475569" }}>{archived.length + notes.length}</div>
                     <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: ".07em", fontWeight: 600, marginTop: 3 }}>Total</div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: "flex", gap: 4, background: "#F4F5F7", borderRadius: 12, padding: 4, width: "fit-content", marginBottom: 24 }}>
+            <div className="archive-tabs-bar" style={{ display: "flex", gap: 4, background: "#F4F5F7", borderRadius: 12, padding: 4, width: "fit-content", marginBottom: 24 }}>
                 {tabBtn("tasks", "Tasks", archived.length)}
                 {tabBtn("notes", "Notes", notes.length)}
             </div>
@@ -116,7 +117,7 @@ export default function ArchivePage({ tasks, stages = [], onRestore, onDelete, n
                             const dl = t.date ? new Date(t.date) : null;
                             const dlS = dl ? `${MONTHS[dl.getMonth()]} ${dl.getDate()}, ${dl.getFullYear()}` : "No deadline";
                             return (
-                                <div key={t.id} className="row-hover archive-row"
+                                <div key={t.id} className="row-hover archive-row archive-task-row"
                                     style={{ background: "#fff", border: "1px solid #E8EAED", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,.04)", transition: "box-shadow .15s", flexWrap: "wrap" }}
                                 >
                                     <div style={{ width: 22, height: 22, flexShrink: 0, background: "#475569", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 700 }}>✓</div>

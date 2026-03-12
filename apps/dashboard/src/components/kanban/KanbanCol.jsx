@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import TaskCard from "./TaskCard";
 
-export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove, onDuplicate }) {
+export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove, onDuplicate, darkMode = false }) {
     const isDoneCol = col.id === "done" || col.label?.toLowerCase() === "done";
     const [over, setOver] = useState(false);
     const ref = useRef(null);
@@ -17,14 +17,15 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
     return (
         <div
             ref={ref}
+            className="kanban-col"
             style={{
                 width: "100%",
-                background: over ? "#F5F8FF" : "#FAFAFA",
-                border: `1.5px solid ${over ? "rgba(37,99,235,.25)" : "#EBEBED"}`,
+                background: over ? (darkMode ? "#1E2A40" : "#F5F8FF") : (darkMode ? "#161820" : "#FAFAFA"),
+                border: `1.5px solid ${over ? "rgba(37,99,235,.25)" : (darkMode ? "#2A2D3A" : "#EBEBED")}`,
                 borderRadius: 18,
                 padding: "14px 14px 10px",
                 minHeight: 300,
-                boxShadow: over ? "0 4px 24px rgba(37,99,235,.07)" : "0 1px 2px rgba(0,0,0,.03)",
+                boxShadow: over ? "0 4px 24px rgba(37,99,235,.07)" : (darkMode ? "none" : "0 1px 2px rgba(0,0,0,.03)"),
                 animation: `colIn .38s cubic-bezier(.22,1,.36,1) ${animDelay}s both`,
                 boxSizing: "border-box",
                 transition: "border-color .18s, background .18s, box-shadow .18s",
@@ -63,8 +64,8 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
                     className="col-add-hover"
                     onClick={onAdd}
                     style={{
-                        width: 26, height: 26, border: "1.5px solid #E8EAED",
-                        borderRadius: 8, background: "#fff", color: "#9CA3AF",
+                        width: 26, height: 26, border: `1.5px solid ${darkMode ? "#2A2D3A" : "#E8EAED"}`,
+                        borderRadius: 8, background: darkMode ? "#1A1C25" : "#fff", color: "#9CA3AF",
                         fontSize: 17, display: "flex", alignItems: "center",
                         justifyContent: "center", cursor: "pointer",
                         transition: "all .15s", lineHeight: 1,
@@ -74,7 +75,7 @@ export default function KanbanCol({ col, tasks, animDelay, onEdit, onAdd, onMove
             </div>
 
             {/* Divider */}
-            <div style={{ height: 1, background: "#EBEBED", marginBottom: 10, borderRadius: 1 }} />
+            <div className="kanban-divider" style={{ height: 1, background: darkMode ? "#2A2D3A" : "#EBEBED", marginBottom: 10, borderRadius: 1 }} />
 
             {/* ── Cards area ── */}
             <div style={{

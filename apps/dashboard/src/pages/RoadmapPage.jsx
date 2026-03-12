@@ -36,7 +36,7 @@ const VIEWS = [
 ];
 
 export default function RoadmapPage({
-    tasks, stages, showTimer = true,
+    tasks, stages, showTimer = true, darkMode = false,
     onEditTask, onAddTask, onMoveTask, onPatchTask, onTimerDone, onDuplicateTask
 }) {
     const [view, setView] = useState("kanban");
@@ -105,7 +105,7 @@ export default function RoadmapPage({
                                     display: "flex", alignItems: "center", gap: 6,
                                     whiteSpace: "nowrap",
                                 }}
-                                className="view-tab"
+                                className={`view-tab${isActive ? " view-tab--active" : ""}`}
                             >
                                 {v.icon} {v.label}
                             </button>
@@ -140,7 +140,7 @@ export default function RoadmapPage({
                                 return (
                                     <div key={col.id} style={{ width: colWidth, flexShrink: 0, display: "flex", flexDirection: "column" }}>
                                         <KanbanCol col={col} tasks={colTasks} animDelay={ci * 0.07}
-                                            onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} onDuplicate={onDuplicateTask} />
+                                            onEdit={onEditTask} onAdd={() => onAddTask(col.id)} onMove={onMoveTask} onDuplicate={onDuplicateTask} darkMode={darkMode} />
                                     </div>
                                 );
                             })}

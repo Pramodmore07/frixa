@@ -5,9 +5,9 @@ import StagesModal from "../components/modals/StagesModal";
 
 function Section({ title, desc, children }) {
     return (
-        <div style={{ background: "#fff", border: "1.5px solid #E8EAED", borderRadius: 20, overflow: "hidden", marginBottom: 20 }}>
-            <div style={{ padding: "20px 28px 16px", borderBottom: "1px solid #F0F1F3" }}>
-                <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 700, color: "#111218" }}>{title}</div>
+        <div className="settings-section" style={{ background: "#fff", border: "1.5px solid #E8EAED", borderRadius: 20, overflow: "hidden", marginBottom: 20 }}>
+            <div className="settings-section-hdr" style={{ padding: "20px 28px 16px", borderBottom: "1px solid #F0F1F3" }}>
+                <div className="settings-section-title" style={{ fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 700, color: "#111218" }}>{title}</div>
                 {desc && <div style={{ fontSize: 12.5, color: "#9CA3AF", marginTop: 3 }}>{desc}</div>}
             </div>
             <div style={{ padding: "8px 28px 20px" }}>{children}</div>
@@ -19,7 +19,7 @@ function Row({ label, desc, children }) {
     return (
         <div className="settings-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 0", borderBottom: "1px solid #F9FAFB" }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontFamily: "'Poppins',sans-serif", fontSize: 13.5, fontWeight: 600, color: "#111218" }}>{label}</div>
+                <div className="settings-row-label" style={{ fontFamily: "'Poppins',sans-serif", fontSize: 13.5, fontWeight: 600, color: "#111218" }}>{label}</div>
                 {desc && <div style={{ fontSize: 12, color: "#9CA3AF", marginTop: 2 }}>{desc}</div>}
             </div>
             <div className="settings-row-ctrl" style={{ flexShrink: 0 }}>{children}</div>
@@ -30,6 +30,8 @@ function Row({ label, desc, children }) {
 function Toggle({ value, onChange }) {
     return (
         <button
+            className="frixa-toggle"
+            data-checked={value}
             onClick={() => onChange(!value)}
             style={{
                 width: 44, height: 25, borderRadius: 99, border: "none",
@@ -121,10 +123,16 @@ export default function SettingsPage({
 
     /* Appearance */
     const [showTimer, setShowTimer] = useState(settings.showTimer ?? false);
+    const [darkMode, setDarkMode] = useState(settings.darkMode ?? false);
 
     const handleTimerToggle = (val) => {
         setShowTimer(val);
-        onSave({ showTimer: val });
+        onSave({ ...settings, showTimer: val });
+    };
+
+    const handleDarkModeToggle = (val) => {
+        setDarkMode(val);
+        onSave({ ...settings, darkMode: val });
     };
 
     /* Workspace / Stages */
@@ -167,6 +175,7 @@ export default function SettingsPage({
 
                 <Row label="Display Name" desc="Shown in activity logs and collaboration features">
                     <input
+                        className="settings-input"
                         value={displayName}
                         onChange={e => setDisplayName(e.target.value)}
                         placeholder="Your name"
@@ -182,7 +191,7 @@ export default function SettingsPage({
                 </Row>
 
                 <Row label="Email" desc="Your Supabase account email — cannot be changed here">
-                    <div style={{
+                    <div className="settings-email-box" style={{
                         padding: "8px 12px", border: "1.5px solid #E8EAED", borderRadius: 10,
                         fontFamily: "'Poppins',sans-serif", fontSize: 13, color: "#9CA3AF",
                         background: "#F4F5F7", width: 200, boxSizing: "border-box",
@@ -199,6 +208,9 @@ export default function SettingsPage({
 
             {/* ── Appearance ── */}
             <Section title="Appearance" desc="Customize how the app looks and behaves">
+                <Row label="Night Mode" desc="Switch the interface to a dark color scheme">
+                    <Toggle value={darkMode} onChange={handleDarkModeToggle} />
+                </Row>
                 <Row label="Focus Timer" desc="Show the focus session countdown timer on the Roadmap page">
                     <Toggle value={showTimer} onChange={handleTimerToggle} />
                 </Row>
@@ -227,7 +239,7 @@ export default function SettingsPage({
                 {/* Stage list preview */}
                 <div style={{ paddingTop: 8, display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {stages.map(s => (
-                        <div key={s.id} style={{
+                        <div key={s.id} className="settings-stage-pill" style={{
                             display: "flex", alignItems: "center", gap: 6,
                             padding: "5px 12px", background: "#F4F5F7", borderRadius: 99,
                             fontSize: 12, fontWeight: 600, color: "#374151",
