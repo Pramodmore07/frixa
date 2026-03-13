@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal, ModalFoot, Btn, GhostBtn, DangerBtn, Input } from "../ui";
 import { DOT_PALETTE, DEFAULT_STAGES } from "../../constants";
 
-function genId() { return "stage_" + Math.random().toString(36).slice(2, 9); }
+function genId() { return "stage_" + crypto.randomUUID().replace(/-/g, "").slice(0, 12); }
 
 export default function StagesModal({ stages, tasks, onSave, onDelete, onClose }) {
     const [list, setList] = useState(stages.map((s) => ({ ...s })));

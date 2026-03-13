@@ -95,8 +95,18 @@ function UsersPanel() {
 
   const toggleRole = async (u) => {
     const newRole = u.role === "admin" ? "user" : "admin";
+    // Prevent an admin from demoting themselves (would lock them out)
+    const { data: { user: me } } = await supabase.auth.getUser();
+    if (me && me.id === u.id) {
+      showToast("You cannot change your own role.", "error");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Change ${u.email}'s role to "${newRole}"? This affects their access immediately.`
+    );
+    if (!confirmed) return;
     const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", u.id);
-    if (error) showToast("Failed: " + error.message, "error");
+    if (error) showToast("Failed to update role.", "error");
     else { showToast(`${u.email} is now ${newRole}`); load(); }
   };
 
@@ -288,11 +298,11 @@ function SettingsPanel() {
 
   const changePassword = async () => {
     if (!pwForm.next || pwForm.next !== pwForm.confirm) { showToast("Passwords do not match", "error"); return; }
-    if (pwForm.next.length < 6) { showToast("Password must be at least 6 characters", "error"); return; }
+    if (pwForm.next.length < 8) { showToast("Password must be at least 8 characters", "error"); return; }
     setPwLoading(true);
     const { error } = await supabase.auth.updateUser({ password: pwForm.next });
     setPwLoading(false);
-    if (error) showToast("Failed: " + error.message, "error");
+    if (error) showToast("Failed to update password. Please try again.", "error");
     else { showToast("Password updated successfully"); setPwForm({ current: "", next: "", confirm: "" }); }
   };
 
