@@ -87,7 +87,13 @@ export default function RoadmapPage({
             </div>
 
             {/* ── Focus Timer ── */}
-            {showTimer && <FocusTimer onDone={onTimerDone} />}
+            {showTimer && (
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 0 }}>
+                    <div style={{ width: "60%", minWidth: 480 }}>
+                        <FocusTimer onDone={onTimerDone} />
+                    </div>
+                </div>
+            )}
 
             {/* ── View switcher ── */}
             <div className="view-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, gap: 12 }}>
