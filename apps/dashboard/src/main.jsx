@@ -4,23 +4,62 @@ import App from "./App.jsx";
 
 // Global Error Handler to catch runtime errors that cause blank screen
 window.onerror = function (message, source, lineno, colno, error) {
-  console.error("Global Error:", { message, source, lineno, colno, error });
-  const rootElement = document.getElementById("root");
-  const isDev = import.meta.env.DEV;
-  if (rootElement) {
-    rootElement.innerHTML = `
-      <div style="background:#fff; color:#ef4444; padding:40px; font-family:sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-        <h1 style="margin-bottom:16px;">Application Error</h1>
-        <p style="color:#6b7280; max-width:500px; line-height:1.6; margin-bottom:24px;">
-          Something went wrong. Please reload the page or contact support if the problem persists.
-        </p>
-        ${isDev ? `<div style="background:#f3f4f6; padding:16px; border-radius:8px; text-align:left; font-size:12px; width:100%; max-width:600px; overflow:auto; margin-bottom:24px;"><code>${String(message).slice(0, 200)}</code><br/><code style="color:#9ca3af; margin-top:8px; display:block;">Check browser console for details</code></div>` : ""}
-        <button onclick="window.location.reload()" style="margin-top:8px; padding:12px 24px; background:#111218; color:#fff; border:none; border-radius:10px; font-weight:700; cursor:pointer;">
-          Reload Application
-        </button>
-      </div>
-    `;
+  if (import.meta.env.DEV) {
+    console.error("Global Error:", { message, source, lineno, colno, error });
   }
+  const rootElement = document.getElementById("root");
+  if (!rootElement) return;
+
+  // Build DOM safely — never use innerHTML with dynamic content to prevent XSS
+  rootElement.textContent = "";
+
+  const wrapper = document.createElement("div");
+  Object.assign(wrapper.style, {
+    background: "#fff", color: "#ef4444", padding: "40px",
+    fontFamily: "sans-serif", minHeight: "100vh", display: "flex",
+    flexDirection: "column", alignItems: "center", justifyContent: "center",
+    textAlign: "center",
+  });
+
+  const heading = document.createElement("h1");
+  heading.style.marginBottom = "16px";
+  heading.textContent = "Application Error";
+
+  const para = document.createElement("p");
+  Object.assign(para.style, { color: "#6b7280", maxWidth: "500px", lineHeight: "1.6", marginBottom: "24px" });
+  para.textContent = "Something went wrong. Please reload the page or contact support if the problem persists.";
+
+  const btn = document.createElement("button");
+  Object.assign(btn.style, {
+    marginTop: "8px", padding: "12px 24px", background: "#111218",
+    color: "#fff", border: "none", borderRadius: "10px", fontWeight: "700", cursor: "pointer",
+  });
+  btn.textContent = "Reload Application";
+  btn.addEventListener("click", () => window.location.reload());
+
+  wrapper.appendChild(heading);
+  wrapper.appendChild(para);
+
+  if (import.meta.env.DEV) {
+    const details = document.createElement("div");
+    Object.assign(details.style, {
+      background: "#f3f4f6", padding: "16px", borderRadius: "8px",
+      textAlign: "left", fontSize: "12px", width: "100%", maxWidth: "600px",
+      overflow: "auto", marginBottom: "24px",
+    });
+    const code = document.createElement("code");
+    code.textContent = String(message).slice(0, 200);
+    const hint = document.createElement("code");
+    Object.assign(hint.style, { color: "#9ca3af", marginTop: "8px", display: "block" });
+    hint.textContent = "Check browser console for details";
+    details.appendChild(code);
+    details.appendChild(document.createElement("br"));
+    details.appendChild(hint);
+    wrapper.appendChild(details);
+  }
+
+  wrapper.appendChild(btn);
+  rootElement.appendChild(wrapper);
 };
 
 const root = createRoot(document.getElementById("root"));

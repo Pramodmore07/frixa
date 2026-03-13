@@ -30,7 +30,7 @@ export default function LoginScreen({ onGuestMode }) {
                 redirectTo: window.location.origin,
             },
         });
-        if (err) { setError(err.message); setGoogleLoading(false); }
+        if (err) { setError("Google sign-in failed. Please try again."); setGoogleLoading(false); }
         // On success Supabase redirects — page will reload with session
     };
 
@@ -45,13 +45,13 @@ export default function LoginScreen({ onGuestMode }) {
                     email, password,
                     options: { emailRedirectTo: appUrl },
                 });
-                if (err) { setError(err.message); }
+                if (err) { setError("Could not create account. Please check your details and try again."); }
                 else { setInfo("✅ Account created! Check your email for a confirmation link, then sign in."); setMode("signin"); }
             } else {
                 const { error: err } = await supabase.auth.signInWithPassword({ email, password });
                 if (err) {
-                    // Generic message prevents user enumeration (avoids revealing if email exists/is confirmed)
-                    setError("Incorrect email or password. If you just signed up, check your inbox for a confirmation link.");
+                    // Generic message prevents user enumeration
+                    setError("Invalid email or password.");
                 }
             }
         } finally {

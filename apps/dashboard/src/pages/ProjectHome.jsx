@@ -33,10 +33,15 @@ export default function ProjectHome({ user, onSelectProject }) {
     }, []);
 
     const handleCreate = async () => {
-        if (!newName.trim()) return;
+        const trimmedName = newName.trim();
+        if (!trimmedName) return;
+        if (trimmedName.length > 100) {
+            setCreateError("Project name must be 100 characters or fewer.");
+            return;
+        }
         setSaving(true);
         setCreateError("");
-        const { data, error } = await createProject(newName.trim(), user.id);
+        const { data, error } = await createProject(trimmedName, user.id);
         setSaving(false);
         if (error) {
             setCreateError(error.message || "Failed to create project.");

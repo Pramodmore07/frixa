@@ -225,8 +225,13 @@ const VALID_ACTIONS = new Set([
 
 export async function logActivity(projectId, userId, action, details = {}) {
     if (!VALID_ACTIONS.has(action)) return; // silently ignore unknown actions
-    // Serialize and cap details to prevent oversized payloads
-    const safeDetails = JSON.parse(JSON.stringify(details).slice(0, 1024));
+    // Truncate each string value individually so the resulting object is always valid JSON
+    const safeDetails = Object.fromEntries(
+        Object.entries(details).slice(0, 20).map(([k, v]) => [
+            String(k).slice(0, 64),
+            typeof v === "string" ? v.slice(0, 256) : v,
+        ])
+    );
     return supabase.from("activity_log").insert({
         project_id: projectId,
         user_id: userId,
