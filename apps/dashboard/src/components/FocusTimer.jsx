@@ -9,8 +9,8 @@ const PRESETS = [
     { label: "1h",  h: 1, m: 0,  s: 0 },
 ];
 
-const R    = 108;
-const SW   = 7;
+const R    = 72;
+const SW   = 5;
 const SIZE = (R + SW) * 2;
 const CIRC = 2 * Math.PI * R;
 
@@ -86,8 +86,8 @@ export default function FocusTimer({ onDone }) {
             <div className="ft-inner" style={{
                 display: "flex",
                 alignItems: "center",
-                padding: "20px 28px 20px",
-                gap: 36,
+                padding: "14px 24px 14px",
+                gap: 28,
             }}>
 
                 {/* ── Big Ring ── */}
@@ -118,8 +118,8 @@ export default function FocusTimer({ onDone }) {
                     }}>
                         <span style={{
                             fontFamily: "'Poppins',sans-serif",
-                            fontSize: 42, fontWeight: 800,
-                            color: "#0F1117", letterSpacing: "-2.5px", lineHeight: 1,
+                            fontSize: 32, fontWeight: 800,
+                            color: "#0F1117", letterSpacing: "-2px", lineHeight: 1,
                             fontVariantNumeric: "tabular-nums",
                             transition: "color .4s",
                         }}>{shown}</span>
@@ -135,7 +135,7 @@ export default function FocusTimer({ onDone }) {
                         </span>
 
                         {total > 0 && (
-                            <div style={{ width: 64, height: 2, background: "#EBEDF2", borderRadius: 99, overflow: "hidden", marginTop: 5 }}>
+                            <div style={{ width: 48, height: 2, background: "#EBEDF2", borderRadius: 99, overflow: "hidden", marginTop: 4 }}>
                                 <div style={{
                                     height: "100%", width: `${pct * 100}%`,
                                     borderRadius: 99, background: accent,
@@ -147,7 +147,7 @@ export default function FocusTimer({ onDone }) {
                 </div>
 
                 {/* ── Right panel ── */}
-                <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
 
                     {/* Row 1: header left + preset pills right */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
@@ -181,8 +181,8 @@ export default function FocusTimer({ onDone }) {
                                 return (
                                     <button key={p.label} onClick={() => applyPreset(p)} disabled={running}
                                         style={{
-                                            padding: "4px 11px", borderRadius: 99,
-                                            fontFamily: "'Poppins',sans-serif", fontSize: 11.5, fontWeight: 600,
+                                            padding: "3px 10px", borderRadius: 99,
+                                            fontFamily: "'Poppins',sans-serif", fontSize: 11, fontWeight: 600,
                                             cursor: running ? "not-allowed" : "pointer",
                                             border: isActive ? `1.5px solid ${accent}` : "1.5px solid #E8EAED",
                                             background: isActive ? accent : "#FAFAFA",
@@ -203,7 +203,7 @@ export default function FocusTimer({ onDone }) {
                         onChange={(e) => setLabel(e.target.value)}
                         placeholder="What are you focusing on?"
                         style={{
-                            width: "100%", padding: "9px 14px", borderRadius: 10,
+                            width: "100%", padding: "7px 12px", borderRadius: 9,
                             background: "#FAFAFA", border: "1.5px solid #EBEDF2",
                             fontFamily: "'Inter',sans-serif", fontSize: 13, color: "#374151",
                             outline: "none", boxSizing: "border-box",
@@ -219,8 +219,8 @@ export default function FocusTimer({ onDone }) {
                         {/* Compact H:M:S */}
                         <div style={{
                             display: "flex", alignItems: "center", gap: 3,
-                            background: "#F4F5F7", borderRadius: 10, padding: "0 10px",
-                            border: "1.5px solid #EBEDF2", height: 42, flexShrink: 0,
+                            background: "#F4F5F7", borderRadius: 9, padding: "0 8px",
+                            border: "1.5px solid #EBEDF2", height: 36, flexShrink: 0,
                         }}>
                             {[["H", h, setH, 23], ["M", m, setM, 59], ["S", s, setS, 59]].map(([lbl, val, setter, max], i) => (
                                 <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 3 }}>
@@ -232,7 +232,7 @@ export default function FocusTimer({ onDone }) {
                                             style={{
                                                 width: 32, height: 22, textAlign: "center",
                                                 background: "transparent", border: "none",
-                                                fontFamily: "'Poppins',sans-serif", fontSize: 15, fontWeight: 800,
+                                                fontFamily: "'Poppins',sans-serif", fontSize: 13, fontWeight: 800,
                                                 color: "#111218", outline: "none",
                                                 cursor: running ? "not-allowed" : "auto",
                                                 WebkitAppearance: "none", MozAppearance: "textfield",
@@ -250,9 +250,9 @@ export default function FocusTimer({ onDone }) {
                         {!running ? (
                             <button onClick={start}
                                 style={{
-                                    flex: 1, height: 42, borderRadius: 10, border: "none",
+                                    flex: 1, height: 36, borderRadius: 9, border: "none",
                                     background: accent, color: "#fff",
-                                    fontFamily: "'Poppins',sans-serif", fontSize: 13.5, fontWeight: 700,
+                                    fontFamily: "'Poppins',sans-serif", fontSize: 12.5, fontWeight: 700,
                                     cursor: "pointer", letterSpacing: ".01em",
                                     boxShadow: `0 4px 14px ${accent}40`,
                                     transition: "opacity .15s, box-shadow .15s, background .4s",
@@ -269,7 +269,7 @@ export default function FocusTimer({ onDone }) {
                         ) : (
                             <button onClick={pause}
                                 style={{
-                                    flex: 1, height: 42, borderRadius: 10,
+                                    flex: 1, height: 36, borderRadius: 9,
                                     border: `1.5px solid ${accent}33`,
                                     background: accentBg, color: accent,
                                     fontFamily: "'Poppins',sans-serif", fontSize: 13.5, fontWeight: 700,
@@ -288,7 +288,7 @@ export default function FocusTimer({ onDone }) {
                         {/* Reset icon button */}
                         <button onClick={reset} title="Reset"
                             style={{
-                                width: 42, height: 42, borderRadius: 10, flexShrink: 0,
+                                width: 36, height: 36, borderRadius: 9, flexShrink: 0,
                                 border: "1.5px solid #EBEDF2", background: "#FAFAFA",
                                 color: "#94A3B8", cursor: "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center",
